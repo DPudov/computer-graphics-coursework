@@ -1,0 +1,14 @@
+{
+  "name": "computer-graphics-coursework-frontend",
+  "version": "0.1.0",
+  "description": "Frontend for Pudov's coursework",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "author": "Dmitry Pudov",
+  "license": "ISC",
+  "dependencies": {
+    "electron": "^6.0.11"
+  }
+}
