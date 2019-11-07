@@ -14,7 +14,7 @@
 
 (def light-dir [0 0 1])
 
-(def eye [2 0 3])
+(def eye [3 0 2])
 
 (def center [0 0 0])
 
