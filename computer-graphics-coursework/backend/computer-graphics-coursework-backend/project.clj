@@ -3,5 +3,7 @@
   :url "https://github.com/DPudov"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
-  :dependencies [[org.clojure/clojure "1.8.0"]
-                 [uncomplicate/clojurecl "0.13.0"]])
+  :dependencies [[org.clojure/clojure "1.10.0"]
+                 [uncomplicate/clojurecl "0.13.0"]]
+  :repl-options {:init-ns computer-graphics-coursework-backend.core}
+  :main computer-graphics-coursework-backend.core)
