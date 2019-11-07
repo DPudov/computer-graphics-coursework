@@ -1,0 +1,9 @@
+/media/dpudov/media/workspace/fifth_semester/computer-graphics-coursework/report/report/build/CMakeFiles/latex-stage2.dir
+/media/dpudov/media/workspace/fifth_semester/computer-graphics-coursework/report/report/build/CMakeFiles/latex-stage1.dir
+/media/dpudov/media/workspace/fifth_semester/computer-graphics-coursework/report/report/build/CMakeFiles/rebuild_cache.dir
+/media/dpudov/media/workspace/fifth_semester/computer-graphics-coursework/report/report/build/CMakeFiles/printpdfs.dir
+/media/dpudov/media/workspace/fifth_semester/computer-graphics-coursework/report/report/build/CMakeFiles/bibtex.dir
+/media/dpudov/media/workspace/fifth_semester/computer-graphics-coursework/report/report/build/CMakeFiles/latex-stage3.dir
+/media/dpudov/media/workspace/fifth_semester/computer-graphics-coursework/report/report/build/CMakeFiles/edit_cache.dir
+/media/dpudov/media/workspace/fifth_semester/computer-graphics-coursework/report/report/build/CMakeFiles/makeindex.dir
+/media/dpudov/media/workspace/fifth_semester/computer-graphics-coursework/report/report/build/CMakeFiles/pdf.dir
