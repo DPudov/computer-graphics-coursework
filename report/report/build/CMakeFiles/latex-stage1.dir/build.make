@@ -63,8 +63,6 @@ CMakeFiles/latex-stage1: mirror/tex/20-analysis.tex
 CMakeFiles/latex-stage1: mirror/tex/30-design.tex
 CMakeFiles/latex-stage1: mirror/tex/40-impl.tex
 CMakeFiles/latex-stage1: mirror/tex/50-research.tex
-CMakeFiles/latex-stage1: mirror/tex/60-economics.tex
-CMakeFiles/latex-stage1: mirror/tex/70-bzd.tex
 CMakeFiles/latex-stage1: mirror/tex/80-conclusion.tex
 CMakeFiles/latex-stage1: mirror/tex/81-biblio.tex
 CMakeFiles/latex-stage1: mirror/tex/90-appendix1.tex
@@ -137,92 +135,84 @@ mirror/tex/50-research.tex: ../tex/50-research.tex
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/media/dpudov/media/workspace/fifth_semester/computer-graphics-coursework/report/report/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Generating mirror/tex/50-research.tex"
 	/usr/bin/cmake -E copy /media/dpudov/media/workspace/fifth_semester/computer-graphics-coursework/report/report/tex/50-research.tex /media/dpudov/media/workspace/fifth_semester/computer-graphics-coursework/report/report/build/mirror/tex/50-research.tex
 
-mirror/tex/60-economics.tex: ../tex/60-economics.tex
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/media/dpudov/media/workspace/fifth_semester/computer-graphics-coursework/report/report/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_11) "Generating mirror/tex/60-economics.tex"
-	/usr/bin/cmake -E copy /media/dpudov/media/workspace/fifth_semester/computer-graphics-coursework/report/report/tex/60-economics.tex /media/dpudov/media/workspace/fifth_semester/computer-graphics-coursework/report/report/build/mirror/tex/60-economics.tex
-
-mirror/tex/70-bzd.tex: ../tex/70-bzd.tex
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/media/dpudov/media/workspace/fifth_semester/computer-graphics-coursework/report/report/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_12) "Generating mirror/tex/70-bzd.tex"
-	/usr/bin/cmake -E copy /media/dpudov/media/workspace/fifth_semester/computer-graphics-coursework/report/report/tex/70-bzd.tex /media/dpudov/media/workspace/fifth_semester/computer-graphics-coursework/report/report/build/mirror/tex/70-bzd.tex
-
 mirror/tex/80-conclusion.tex: ../tex/80-conclusion.tex
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/media/dpudov/media/workspace/fifth_semester/computer-graphics-coursework/report/report/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_13) "Generating mirror/tex/80-conclusion.tex"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/media/dpudov/media/workspace/fifth_semester/computer-graphics-coursework/report/report/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_11) "Generating mirror/tex/80-conclusion.tex"
 	/usr/bin/cmake -E copy /media/dpudov/media/workspace/fifth_semester/computer-graphics-coursework/report/report/tex/80-conclusion.tex /media/dpudov/media/workspace/fifth_semester/computer-graphics-coursework/report/report/build/mirror/tex/80-conclusion.tex
 
 mirror/tex/81-biblio.tex: ../tex/81-biblio.tex
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/media/dpudov/media/workspace/fifth_semester/computer-graphics-coursework/report/report/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_14) "Generating mirror/tex/81-biblio.tex"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/media/dpudov/media/workspace/fifth_semester/computer-graphics-coursework/report/report/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_12) "Generating mirror/tex/81-biblio.tex"
 	/usr/bin/cmake -E copy /media/dpudov/media/workspace/fifth_semester/computer-graphics-coursework/report/report/tex/81-biblio.tex /media/dpudov/media/workspace/fifth_semester/computer-graphics-coursework/report/report/build/mirror/tex/81-biblio.tex
 
 mirror/tex/90-appendix1.tex: ../tex/90-appendix1.tex
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/media/dpudov/media/workspace/fifth_semester/computer-graphics-coursework/report/report/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_15) "Generating mirror/tex/90-appendix1.tex"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/media/dpudov/media/workspace/fifth_semester/computer-graphics-coursework/report/report/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_13) "Generating mirror/tex/90-appendix1.tex"
 	/usr/bin/cmake -E copy /media/dpudov/media/workspace/fifth_semester/computer-graphics-coursework/report/report/tex/90-appendix1.tex /media/dpudov/media/workspace/fifth_semester/computer-graphics-coursework/report/report/build/mirror/tex/90-appendix1.tex
 
 mirror/tex/91-appendix2.tex: ../tex/91-appendix2.tex
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/media/dpudov/media/workspace/fifth_semester/computer-graphics-coursework/report/report/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_16) "Generating mirror/tex/91-appendix2.tex"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/media/dpudov/media/workspace/fifth_semester/computer-graphics-coursework/report/report/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_14) "Generating mirror/tex/91-appendix2.tex"
 	/usr/bin/cmake -E copy /media/dpudov/media/workspace/fifth_semester/computer-graphics-coursework/report/report/tex/91-appendix2.tex /media/dpudov/media/workspace/fifth_semester/computer-graphics-coursework/report/report/build/mirror/tex/91-appendix2.tex
 
 mirror/tex/listings.inc.tex: ../tex/listings.inc.tex
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/media/dpudov/media/workspace/fifth_semester/computer-graphics-coursework/report/report/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_17) "Generating mirror/tex/listings.inc.tex"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/media/dpudov/media/workspace/fifth_semester/computer-graphics-coursework/report/report/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_15) "Generating mirror/tex/listings.inc.tex"
 	/usr/bin/cmake -E copy /media/dpudov/media/workspace/fifth_semester/computer-graphics-coursework/report/report/tex/listings.inc.tex /media/dpudov/media/workspace/fifth_semester/computer-graphics-coursework/report/report/build/mirror/tex/listings.inc.tex
 
 mirror/tex/macros.inc.tex: ../tex/macros.inc.tex
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/media/dpudov/media/workspace/fifth_semester/computer-graphics-coursework/report/report/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_18) "Generating mirror/tex/macros.inc.tex"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/media/dpudov/media/workspace/fifth_semester/computer-graphics-coursework/report/report/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_16) "Generating mirror/tex/macros.inc.tex"
 	/usr/bin/cmake -E copy /media/dpudov/media/workspace/fifth_semester/computer-graphics-coursework/report/report/tex/macros.inc.tex /media/dpudov/media/workspace/fifth_semester/computer-graphics-coursework/report/report/build/mirror/tex/macros.inc.tex
 
 mirror/tex/preamble.inc.tex: ../tex/preamble.inc.tex
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/media/dpudov/media/workspace/fifth_semester/computer-graphics-coursework/report/report/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_19) "Generating mirror/tex/preamble.inc.tex"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/media/dpudov/media/workspace/fifth_semester/computer-graphics-coursework/report/report/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_17) "Generating mirror/tex/preamble.inc.tex"
 	/usr/bin/cmake -E copy /media/dpudov/media/workspace/fifth_semester/computer-graphics-coursework/report/report/tex/preamble.inc.tex /media/dpudov/media/workspace/fifth_semester/computer-graphics-coursework/report/report/build/mirror/tex/preamble.inc.tex
 
 mirror/tex/rpz.tex: ../tex/rpz.tex
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/media/dpudov/media/workspace/fifth_semester/computer-graphics-coursework/report/report/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_20) "Generating mirror/tex/rpz.tex"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/media/dpudov/media/workspace/fifth_semester/computer-graphics-coursework/report/report/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_18) "Generating mirror/tex/rpz.tex"
 	/usr/bin/cmake -E copy /media/dpudov/media/workspace/fifth_semester/computer-graphics-coursework/report/report/tex/rpz.tex /media/dpudov/media/workspace/fifth_semester/computer-graphics-coursework/report/report/build/mirror/tex/rpz.tex
 
 mirror/tex/G2-105.sty: ../tex/G2-105.sty
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/media/dpudov/media/workspace/fifth_semester/computer-graphics-coursework/report/report/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_21) "Generating mirror/tex/G2-105.sty"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/media/dpudov/media/workspace/fifth_semester/computer-graphics-coursework/report/report/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_19) "Generating mirror/tex/G2-105.sty"
 	/usr/bin/cmake -E copy /media/dpudov/media/workspace/fifth_semester/computer-graphics-coursework/report/report/tex/G2-105.sty /media/dpudov/media/workspace/fifth_semester/computer-graphics-coursework/report/report/build/mirror/tex/G2-105.sty
 
 mirror/tex/G7-32.sty: ../tex/G7-32.sty
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/media/dpudov/media/workspace/fifth_semester/computer-graphics-coursework/report/report/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_22) "Generating mirror/tex/G7-32.sty"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/media/dpudov/media/workspace/fifth_semester/computer-graphics-coursework/report/report/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_20) "Generating mirror/tex/G7-32.sty"
 	/usr/bin/cmake -E copy /media/dpudov/media/workspace/fifth_semester/computer-graphics-coursework/report/report/tex/G7-32.sty /media/dpudov/media/workspace/fifth_semester/computer-graphics-coursework/report/report/build/mirror/tex/G7-32.sty
 
 mirror/tex/cyrtimespatched.sty: ../tex/cyrtimespatched.sty
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/media/dpudov/media/workspace/fifth_semester/computer-graphics-coursework/report/report/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_23) "Generating mirror/tex/cyrtimespatched.sty"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/media/dpudov/media/workspace/fifth_semester/computer-graphics-coursework/report/report/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_21) "Generating mirror/tex/cyrtimespatched.sty"
 	/usr/bin/cmake -E copy /media/dpudov/media/workspace/fifth_semester/computer-graphics-coursework/report/report/tex/cyrtimespatched.sty /media/dpudov/media/workspace/fifth_semester/computer-graphics-coursework/report/report/build/mirror/tex/cyrtimespatched.sty
 
 mirror/tex/gosttitleGost7-32.sty: ../tex/gosttitleGost7-32.sty
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/media/dpudov/media/workspace/fifth_semester/computer-graphics-coursework/report/report/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_24) "Generating mirror/tex/gosttitleGost7-32.sty"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/media/dpudov/media/workspace/fifth_semester/computer-graphics-coursework/report/report/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_22) "Generating mirror/tex/gosttitleGost7-32.sty"
 	/usr/bin/cmake -E copy /media/dpudov/media/workspace/fifth_semester/computer-graphics-coursework/report/report/tex/gosttitleGost7-32.sty /media/dpudov/media/workspace/fifth_semester/computer-graphics-coursework/report/report/build/mirror/tex/gosttitleGost7-32.sty
 
 mirror/tex/gosttitleGostRV15-110.sty: ../tex/gosttitleGostRV15-110.sty
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/media/dpudov/media/workspace/fifth_semester/computer-graphics-coursework/report/report/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_25) "Generating mirror/tex/gosttitleGostRV15-110.sty"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/media/dpudov/media/workspace/fifth_semester/computer-graphics-coursework/report/report/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_23) "Generating mirror/tex/gosttitleGostRV15-110.sty"
 	/usr/bin/cmake -E copy /media/dpudov/media/workspace/fifth_semester/computer-graphics-coursework/report/report/tex/gosttitleGostRV15-110.sty /media/dpudov/media/workspace/fifth_semester/computer-graphics-coursework/report/report/build/mirror/tex/gosttitleGostRV15-110.sty
 
 mirror/tex/local-minted.sty: ../tex/local-minted.sty
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/media/dpudov/media/workspace/fifth_semester/computer-graphics-coursework/report/report/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_26) "Generating mirror/tex/local-minted.sty"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/media/dpudov/media/workspace/fifth_semester/computer-graphics-coursework/report/report/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_24) "Generating mirror/tex/local-minted.sty"
 	/usr/bin/cmake -E copy /media/dpudov/media/workspace/fifth_semester/computer-graphics-coursework/report/report/tex/local-minted.sty /media/dpudov/media/workspace/fifth_semester/computer-graphics-coursework/report/report/build/mirror/tex/local-minted.sty
 
 mirror/tex/GostBase.clo: ../tex/GostBase.clo
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/media/dpudov/media/workspace/fifth_semester/computer-graphics-coursework/report/report/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_27) "Generating mirror/tex/GostBase.clo"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/media/dpudov/media/workspace/fifth_semester/computer-graphics-coursework/report/report/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_25) "Generating mirror/tex/GostBase.clo"
 	/usr/bin/cmake -E copy /media/dpudov/media/workspace/fifth_semester/computer-graphics-coursework/report/report/tex/GostBase.clo /media/dpudov/media/workspace/fifth_semester/computer-graphics-coursework/report/report/build/mirror/tex/GostBase.clo
 
 mirror/tex/gost780u.bst: ../tex/gost780u.bst
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/media/dpudov/media/workspace/fifth_semester/computer-graphics-coursework/report/report/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_28) "Generating mirror/tex/gost780u.bst"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/media/dpudov/media/workspace/fifth_semester/computer-graphics-coursework/report/report/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_26) "Generating mirror/tex/gost780u.bst"
 	/usr/bin/cmake -E copy /media/dpudov/media/workspace/fifth_semester/computer-graphics-coursework/report/report/tex/gost780u.bst /media/dpudov/media/workspace/fifth_semester/computer-graphics-coursework/report/report/build/mirror/tex/gost780u.bst
 
 mirror/tex/G7-32.cls: ../tex/G7-32.cls
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/media/dpudov/media/workspace/fifth_semester/computer-graphics-coursework/report/report/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_29) "Generating mirror/tex/G7-32.cls"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/media/dpudov/media/workspace/fifth_semester/computer-graphics-coursework/report/report/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_27) "Generating mirror/tex/G7-32.cls"
 	/usr/bin/cmake -E copy /media/dpudov/media/workspace/fifth_semester/computer-graphics-coursework/report/report/tex/G7-32.cls /media/dpudov/media/workspace/fifth_semester/computer-graphics-coursework/report/report/build/mirror/tex/G7-32.cls
 
 mirror/tex/rpz.bib: ../tex/rpz.bib
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/media/dpudov/media/workspace/fifth_semester/computer-graphics-coursework/report/report/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_30) "Generating mirror/tex/rpz.bib"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/media/dpudov/media/workspace/fifth_semester/computer-graphics-coursework/report/report/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_28) "Generating mirror/tex/rpz.bib"
 	/usr/bin/cmake -E copy /media/dpudov/media/workspace/fifth_semester/computer-graphics-coursework/report/report/tex/rpz.bib /media/dpudov/media/workspace/fifth_semester/computer-graphics-coursework/report/report/build/mirror/tex/rpz.bib
 
 mirror/tex/inc/src/test.c: ../src/test.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/media/dpudov/media/workspace/fifth_semester/computer-graphics-coursework/report/report/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_31) "Generating mirror/tex/inc/src/test.c"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/media/dpudov/media/workspace/fifth_semester/computer-graphics-coursework/report/report/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_29) "Generating mirror/tex/inc/src/test.c"
 	/usr/bin/cmake -E copy /media/dpudov/media/workspace/fifth_semester/computer-graphics-coursework/report/report/src/test.c /media/dpudov/media/workspace/fifth_semester/computer-graphics-coursework/report/report/build/mirror/tex/inc/src/test.c
 
 mirror/tex/inc/img/leonardo.png: ../graphics/img/leonardo.png
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/media/dpudov/media/workspace/fifth_semester/computer-graphics-coursework/report/report/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_32) "Generating mirror/tex/inc/img/leonardo.png"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/media/dpudov/media/workspace/fifth_semester/computer-graphics-coursework/report/report/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_30) "Generating mirror/tex/inc/img/leonardo.png"
 	/usr/bin/cmake -E copy /media/dpudov/media/workspace/fifth_semester/computer-graphics-coursework/report/report/graphics/img/leonardo.png /media/dpudov/media/workspace/fifth_semester/computer-graphics-coursework/report/report/build/mirror/tex/inc/img/leonardo.png
 
 latex-stage1: CMakeFiles/latex-stage1
@@ -236,8 +226,6 @@ latex-stage1: mirror/tex/20-analysis.tex
 latex-stage1: mirror/tex/30-design.tex
 latex-stage1: mirror/tex/40-impl.tex
 latex-stage1: mirror/tex/50-research.tex
-latex-stage1: mirror/tex/60-economics.tex
-latex-stage1: mirror/tex/70-bzd.tex
 latex-stage1: mirror/tex/80-conclusion.tex
 latex-stage1: mirror/tex/81-biblio.tex
 latex-stage1: mirror/tex/90-appendix1.tex

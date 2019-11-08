@@ -10,8 +10,6 @@ file(REMOVE_RECURSE
   "mirror/tex/30-design.tex"
   "mirror/tex/40-impl.tex"
   "mirror/tex/50-research.tex"
-  "mirror/tex/60-economics.tex"
-  "mirror/tex/70-bzd.tex"
   "mirror/tex/80-conclusion.tex"
   "mirror/tex/81-biblio.tex"
   "mirror/tex/90-appendix1.tex"
