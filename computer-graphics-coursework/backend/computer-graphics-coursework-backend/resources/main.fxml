@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.canvas.Canvas?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.effect.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<GridPane fx:id="container" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1000.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cg.controller">
+    <columnConstraints>
+        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+        <ColumnConstraints hgrow="SOMETIMES" maxWidth="194.0" minWidth="10.0" prefWidth="182.0" />
+        <ColumnConstraints hgrow="SOMETIMES" maxWidth="218.0" minWidth="10.0" prefWidth="218.0" />
+    </columnConstraints>
+    <rowConstraints>
+        <RowConstraints />
+        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+    </rowConstraints>
+    <VBox GridPane.columnSpan="2" GridPane.hgrow="NEVER" GridPane.rowIndex="1" GridPane.rowSpan="4">
+        <Canvas fx:id="canvas"  height="600" width="1000.0" VBox.vgrow="ALWAYS">
+         <VBox.margin>
+            <Insets/>
+         </VBox.margin></Canvas>
+    </VBox>
+    <VBox prefHeight="400.0" prefWidth="211.0" GridPane.columnIndex="2" GridPane.rowIndex="1" GridPane.rowSpan="4">
+        <Pane prefHeight="89.0" prefWidth="218.0">
+            <HBox prefHeight="52.0" prefWidth="218.0">
+                <TextField fx:id="dxLabel" prefHeight="26.0" prefWidth="90.0" promptText="dx">
+                    <HBox.margin>
+                        <Insets left="10.0" right="10.0" top="20.0" />
+                    </HBox.margin>
+                </TextField>
+                <TextField fx:id="dyLabel" prefHeight="26.0" prefWidth="90.0" promptText="dy">
+                    <padding>
+                        <Insets left="10.0" />
+                    </padding>
+                    <HBox.margin>
+                        <Insets left="10.0" right="10.0" top="20.0" />
+                    </HBox.margin>
+                </TextField>
+            </HBox>
+            <Button fx:id="moveButton" layoutX="4.0" layoutY="52.0" mnemonicParsing="false" prefHeight="33.0" prefWidth="210.0" text="Переместить" textAlignment="CENTER">
+                <font>
+                    <Font name="FreeSans" size="17.0" />
+                </font>
+            </Button>
+        </Pane>
+        <Separator prefWidth="200.0">
+            <VBox.margin>
+                <Insets top="5.0" />
+            </VBox.margin>
+            <effect>
+                <InnerShadow />
+            </effect>
+        </Separator>
+        <HBox prefHeight="52.0" prefWidth="218.0">
+            <TextField prefHeight="26.0" prefWidth="90.0" promptText="X центра" fx:id="xcrField">
+                <HBox.margin>
+                    <Insets left="10.0" right="10.0" top="20.0" />
+                </HBox.margin>
+            </TextField>
+            <TextField fx:id="ycrField" prefHeight="26.0" prefWidth="90.0" promptText="Y центра">
+                <HBox.margin>
+                    <Insets left="10.0" right="10.0" top="20.0" />
+                </HBox.margin>
+            </TextField>
+        </HBox>
+        <TextField fx:id="arField" promptText="Угол поворота (градусы)">
+            <VBox.margin>
+                <Insets left="10.0" right="10.0" />
+            </VBox.margin>
+        </TextField>
+        <Button fx:id="rotateButton" mnemonicParsing="false" prefHeight="26.0" prefWidth="213.0" text="Повернуть">
+            <VBox.margin>
+                <Insets left="10.0" right="10.0" top="10.0" />
+            </VBox.margin>
+            <font>
+                <Font name="FreeSans" size="17.0" />
+            </font>
+        </Button>
+        <Separator prefWidth="200.0">
+            <VBox.margin>
+                <Insets top="5.0" />
+            </VBox.margin>
+            <effect>
+                <InnerShadow />
+            </effect>
+        </Separator>
+        <HBox prefHeight="60.0" prefWidth="218.0">
+            <TextField prefHeight="26.0" prefWidth="90.0" promptText="X центра" fx:id="xcsField">
+                <HBox.margin>
+                    <Insets left="10.0" right="10.0" top="20.0" />
+                </HBox.margin>
+            </TextField>
+            <TextField fx:id="ycsField" prefHeight="26.0" prefWidth="90.0" promptText="Y центра">
+                <HBox.margin>
+                    <Insets left="10.0" right="10.0" top="20.0" />
+                </HBox.margin>
+            </TextField>
+        </HBox>
+        <HBox prefHeight="30.0" prefWidth="218.0">
+            <TextField fx:id="kxField" prefHeight="26.0" prefWidth="90.0" promptText="kx">
+                <HBox.margin>
+                    <Insets left="10.0" right="10.0" />
+                </HBox.margin>
+            </TextField>
+            <TextField fx:id="kyField" prefHeight="26.0" prefWidth="90.0" promptText="ky">
+                <HBox.margin>
+                    <Insets left="10.0" right="10.0" />
+                </HBox.margin>
+            </TextField>
+        </HBox>
+        <Button fx:id="scaleButton" mnemonicParsing="false" prefHeight="26.0" prefWidth="209.0" text="Масштабировать">
+            <VBox.margin>
+                <Insets left="10.0" right="10.0" top="5.0" />
+            </VBox.margin>
+            <font>
+                <Font name="FreeSans" size="17.0" />
+            </font>
+        </Button>
+        <Separator prefWidth="200.0">
+            <VBox.margin>
+                <Insets top="5.0" />
+            </VBox.margin>
+            <effect>
+                <InnerShadow />
+            </effect>
+        </Separator>
+        <Button fx:id="rollbackButton" disable="true" mnemonicParsing="false" prefHeight="33.0" prefWidth="207.0" text="Откатить действие">
+            <VBox.margin>
+                <Insets left="10.0" right="10.0" top="10.0" />
+            </VBox.margin>
+            <font>
+                <Font name="FreeSans" size="17.0" />
+            </font>
+        </Button>
+        <Separator prefWidth="200.0">
+            <opaqueInsets>
+                <Insets />
+            </opaqueInsets>
+            <VBox.margin>
+                <Insets top="5.0" />
+            </VBox.margin>
+            <effect>
+                <InnerShadow />
+            </effect>
+        </Separator>
+        <Button fx:id="resetButton" mnemonicParsing="false" prefHeight="33.0" prefWidth="210.0" text="Сброс изображения">
+            <font>
+                <Font name="FreeSans" size="17.0" />
+            </font>
+            <VBox.margin>
+                <Insets left="10.0" right="10.0" top="10.0" />
+            </VBox.margin>
+        </Button>
+        <Separator prefWidth="200.0">
+            <VBox.margin>
+                <Insets top="5.0" />
+            </VBox.margin>
+            <effect>
+                <InnerShadow />
+            </effect>
+        </Separator>
+        <Label fx:id="cursorLabel">
+            <VBox.margin>
+                <Insets top="10.0" />
+            </VBox.margin>
+        </Label>
+    </VBox>
+</GridPane>
