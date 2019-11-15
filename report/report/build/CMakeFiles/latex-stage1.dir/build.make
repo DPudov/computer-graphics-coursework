@@ -81,7 +81,6 @@ CMakeFiles/latex-stage1: mirror/tex/GostBase.clo
 CMakeFiles/latex-stage1: mirror/tex/gost780u.bst
 CMakeFiles/latex-stage1: mirror/tex/G7-32.cls
 CMakeFiles/latex-stage1: mirror/tex/rpz.bib
-CMakeFiles/latex-stage1: mirror/tex/inc/src/test.c
 CMakeFiles/latex-stage1: mirror/tex/inc/img/leonardo.png
 	cd /media/dpudov/media/workspace/fifth_semester/computer-graphics-coursework/report/report/build/mirror/tex && /usr/bin/xelatex -synctex=1 -interaction=nonstopmode -shell-escape rpz
 
@@ -207,12 +206,8 @@ mirror/tex/rpz.bib: ../tex/rpz.bib
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/media/dpudov/media/workspace/fifth_semester/computer-graphics-coursework/report/report/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_28) "Generating mirror/tex/rpz.bib"
 	/usr/bin/cmake -E copy /media/dpudov/media/workspace/fifth_semester/computer-graphics-coursework/report/report/tex/rpz.bib /media/dpudov/media/workspace/fifth_semester/computer-graphics-coursework/report/report/build/mirror/tex/rpz.bib
 
-mirror/tex/inc/src/test.c: ../src/test.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/media/dpudov/media/workspace/fifth_semester/computer-graphics-coursework/report/report/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_29) "Generating mirror/tex/inc/src/test.c"
-	/usr/bin/cmake -E copy /media/dpudov/media/workspace/fifth_semester/computer-graphics-coursework/report/report/src/test.c /media/dpudov/media/workspace/fifth_semester/computer-graphics-coursework/report/report/build/mirror/tex/inc/src/test.c
-
 mirror/tex/inc/img/leonardo.png: ../graphics/img/leonardo.png
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/media/dpudov/media/workspace/fifth_semester/computer-graphics-coursework/report/report/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_30) "Generating mirror/tex/inc/img/leonardo.png"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/media/dpudov/media/workspace/fifth_semester/computer-graphics-coursework/report/report/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_29) "Generating mirror/tex/inc/img/leonardo.png"
 	/usr/bin/cmake -E copy /media/dpudov/media/workspace/fifth_semester/computer-graphics-coursework/report/report/graphics/img/leonardo.png /media/dpudov/media/workspace/fifth_semester/computer-graphics-coursework/report/report/build/mirror/tex/inc/img/leonardo.png
 
 latex-stage1: CMakeFiles/latex-stage1
@@ -244,7 +239,6 @@ latex-stage1: mirror/tex/GostBase.clo
 latex-stage1: mirror/tex/gost780u.bst
 latex-stage1: mirror/tex/G7-32.cls
 latex-stage1: mirror/tex/rpz.bib
-latex-stage1: mirror/tex/inc/src/test.c
 latex-stage1: mirror/tex/inc/img/leonardo.png
 latex-stage1: CMakeFiles/latex-stage1.dir/build.make
 

@@ -28,7 +28,6 @@ file(REMOVE_RECURSE
   "mirror/tex/gost780u.bst"
   "mirror/tex/G7-32.cls"
   "mirror/tex/rpz.bib"
-  "mirror/tex/inc/src/test.c"
   "mirror/tex/inc/img/leonardo.png"
 )
 
