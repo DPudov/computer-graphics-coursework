@@ -1,7 +1,7 @@
 # Tools
 
-LATEX=xelatex -interaction=nonstopmode -shell-escape
-# LATEX=pdflatex
+# LATEX=xelatex -interaction=nonstopmode -shell-escape
+LATEX=pdflatex
 TD=./utils/texdepend
 GSCONV=./utils/gsconv.sh
 D2T=dot2tex -f pgf --crop --docpreamble "\usepackage[T2A]{fontenc} \usepackage[utf8]{inputenc} \usepackage[english, russian]{babel}"
