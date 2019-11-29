@@ -3,6 +3,7 @@
             [computer_graphics_coursework_backend.display :as display]
             [computer_graphics_coursework_backend.world :as world]))
 
+
 (def max-fps 60)
 
 (def window-width 800)
@@ -35,5 +36,6 @@
 
 (defn -main []
   "Entry point for entire program"
-  (display/display-setup)
+  (display/display-setup 800 600)
   (world/generate-world window-width window-height))
+

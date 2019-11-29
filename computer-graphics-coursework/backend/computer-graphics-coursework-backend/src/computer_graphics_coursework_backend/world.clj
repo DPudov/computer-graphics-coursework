@@ -2,7 +2,7 @@
 
 (defn generate-world
   [width height]
-  (print "Generating world with size: " width " " height))
+  (println "Generating world with size: " width " " height))
 ;
 ; (defn fulfill_world
 ;     [])
