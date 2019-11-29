@@ -1,4 +1,4 @@
-(ns computer-graphics-coursework-backend.voxel)
+(ns computer_graphics_coursework_backend.voxel)
 
 (map voxel-types [:default
                   :water
