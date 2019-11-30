@@ -36,6 +36,6 @@
 
 (defn -main []
   "Entry point for entire program"
-  (display/display-setup 800 600)
-  (world/generate-world window-width window-height))
+
+  (world/generate-world (display/display-setup)))
 

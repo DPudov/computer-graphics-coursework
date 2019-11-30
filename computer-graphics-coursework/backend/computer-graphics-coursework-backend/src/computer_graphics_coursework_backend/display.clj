@@ -101,22 +101,23 @@
                 :center (create-canvas default-background)
                 :east (create-control-panel)))
 
-(defn create-display-frame
-  ([content] (create-display-frame content 1300 700))
-  ([content width height] (frame :id :display
-                                 :title title
-                                 :on-close :exit
-                                 :width width
-                                 :height height
-                                 :content content
-                                 :minimum-size [640 :by 480])))
 
+(def root
+  (frame :id :display
+         :title title
+         :on-close :exit
+         :width 1300
+         :height 700
+         :content (create-content)
+         :minimum-size [640 :by 480]))
 
+(defn create-display-frame [] root)
 
-(defn display-setup [width height]
+(defn display-setup []
   (invoke-later
-    (-> (create-display-frame (create-content) width height)
+    (-> (create-display-frame)
         add-menu
-        show!)))
+        show!))
+  root)
 
 
