@@ -1,10 +1,19 @@
 (ns computer_graphics_coursework_backend.display
   (:use seesaw.core
         seesaw.graphics
-        seesaw.color))
+        seesaw.color)
+  (:require [clojure.edn :as edn]
+            [clojure.java.io :as io]))
 
 (def title "Курсовая по компьютерной графике. Пудов Д.Ю.")
 (def default-background "#ffffff")
+(def version "Версия")
+(def developer "Разработчик")
+(def help "Помощь")
+(def open "Открыть")
+
+(defn get-version []
+  (some-> (io/resource "project.clj") slurp edn/read-string (nth 2)))
 
 (defn a-sketch [e]
   (println "selecting animation"))
@@ -13,37 +22,56 @@
   (println "help..."))
 
 (defn a-about-developer [e]
-  (println "about..."))
+  (-> (dialog
+        :title developer
+        :content "Пудов Дмитрий Юрьевич, ИУ7-53Б"
+        :type :info)
+      pack!
+      show!))
 
-(defn a-about-version [e])
+(defn a-about-version [e]
+  (->
+    (dialog
+      :title version
+      :content (get-version)
+      :type :info)
+    pack!
+    show!))
 
 
 (def menus
   "Define menus at menubar"
-  (let [a-sketch (action :handler a-sketch :name "Открыть" :tip "Выбор анимации..." :key "menu N")
-        a-help (action :handler a-help :name "Помощь" :tip "Возможные действия в программе" :key "menu H")
-        a-about-developer (action :handler a-about-developer :name "Разработчик" :tip "Информация о разработчике" :key "menu A")
-        a-about-version (action :handler a-about-version :name "Версия" :tip "Информация о версии" :key "menu shift V")]
+  (let [a-sketch (action :handler a-sketch
+                         :name open
+                         :tip "Выбор анимации..."
+                         :key "menu N")
+        a-help (action :handler a-help
+                       :name help
+                       :tip "Возможные действия в программе"
+                       :key "menu H")
+        a-about-developer (action :handler a-about-developer
+                                  :name developer
+                                  :tip "Информация о разработчике"
+                                  :key "menu A")
+        a-about-version (action :handler a-about-version
+                                :name version
+                                :tip "Информация о версии"
+                                :key "menu shift V")]
 
     (menubar :items [(menu :text "Анимация..." :items [a-sketch])
-                     (menu :text "Помощь" :items [a-help])
+                     (menu :text help :items [a-help])
                      (menu :text "О приложении" :items [a-about-developer a-about-version])])))
 
 
 (defn add-menu [frame]
   (config! frame :menubar menus))
 
-
 (defn create-canvas [background]
   (canvas :id :canvas
           :background background
           :paint nil))
-;
-;(defn rotate-controls []
-;  (forms-panel :items ["login" (text) (next-line)
-;                       "Password" (span (text) 3)]))
-;
-;
+
+
 (defn create-control-panel []
   (vertical-panel :items [
                           (horizontal-panel :items [(vertical-panel :items ["dx" (text)])
@@ -69,7 +97,7 @@
 
 
 (defn create-content []
-  (border-panel :hgap 5 :vgap 5 :border 5
+  (border-panel :hgap 10 :vgap 15 :border 5
                 :center (create-canvas default-background)
                 :east (create-control-panel)))
 
