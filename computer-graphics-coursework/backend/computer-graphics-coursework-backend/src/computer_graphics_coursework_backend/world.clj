@@ -89,7 +89,7 @@
     (drawer/draw-point canvas (vec/vector 52 50) Color/BLUE)
     (drawer/draw-point canvas (vec/vector 53 50) Color/BLUE)
     (drawer/draw-point canvas (vec/vector 54 50) Color/BLUE)
-
+    (drawer/draw-line canvas 10 10 200 200 Color/RED)
     (.drawImage g canvas nil nil)))
 
 
