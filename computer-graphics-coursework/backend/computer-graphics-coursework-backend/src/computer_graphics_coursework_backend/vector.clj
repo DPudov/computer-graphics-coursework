@@ -1,5 +1,6 @@
-(ns computer-graphics-coursework-backend.vector
-  (:import (clojure.lang Counted Sequential Associative MapEntry Seqable ILookup IFn)))
+(ns computer_graphics_coursework_backend.vector
+  (:import (clojure.lang Counted Sequential Associative MapEntry Seqable ILookup IFn)
+           (java.io Writer)))
 
 (definterface Coords2D
   (^double getX [])
@@ -414,20 +415,20 @@
     coll
     (apply vector coll)))
 
-(defmethod print-method Vector2D [^Vector2D v ^java.io.Writer w]
+(defmethod print-method Vector2D [^Vector2D v ^Writer w]
   (.write w (.toString v)))
 
-(defmethod print-method Vector3D [^Vector3D v ^java.io.Writer w]
+(defmethod print-method Vector3D [^Vector3D v ^Writer w]
   (.write w (.toString v)))
 
-(defmethod print-method Vector4D [^Vector4D v ^java.io.Writer w]
+(defmethod print-method Vector4D [^Vector4D v ^Writer w]
   (.write w (.toString v)))
 
-(defmethod print-dup Vector2D [^Vector2D v ^java.io.Writer w]
+(defmethod print-dup Vector2D [^Vector2D v ^Writer w]
   (.write w (.toString v)))
 
-(defmethod print-dup Vector3D [^Vector3D v ^java.io.Writer w]
+(defmethod print-dup Vector3D [^Vector3D v ^Writer w]
   (.write w (.toString v)))
 
-(defmethod print-dup Vector4D [^Vector4D v ^java.io.Writer w]
+(defmethod print-dup Vector4D [^Vector4D v ^Writer w]
   (.write w (.toString v)))
