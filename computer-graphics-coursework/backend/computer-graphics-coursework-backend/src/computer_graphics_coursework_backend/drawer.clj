@@ -42,7 +42,7 @@
                   (recur (inc xi) (+ yi y-step) (+ error (- delta-x delta-y)))
                   (recur (inc xi) yi (- error delta-y)))))))))))
 
-
+(defn draw-voxel)
 
 
 

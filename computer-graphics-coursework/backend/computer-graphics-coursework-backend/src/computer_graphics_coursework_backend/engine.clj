@@ -3,7 +3,7 @@
             [computer_graphics_coursework_backend.matrix :as matr]))
 
 (defn render
-  [camera meshes]
+  [canvas]
   (let [view-matrix ()
         projection-matrix ()
         world-matrix ()
