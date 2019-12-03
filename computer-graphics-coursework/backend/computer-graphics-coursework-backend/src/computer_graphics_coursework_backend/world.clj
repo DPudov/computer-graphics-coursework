@@ -21,15 +21,29 @@
   (get-terrain [this] "get terrain as 3d array")
   (get-water [this] "get water as 3d array")
   (get-energy [this] "get water energy")
-  (get-current-simulation-time [this] "return aggregated simulation"))
+  (get-current-simulation-time [this] "return aggregated simulation")
+  (inc-simulation-time [this amount])
+  (update-water [this]))
 
 (defrecord Scene
-  [terrain water energy]
+  [terrain water energy simulation-time]
   SceneAPI
-  (get-terrain [this])
-  (get-water [this])
-  (get-energy [this])
-  (get-current-simulation-time [this]))
+  (get-terrain [this]
+    (:terrain this))
+
+  (get-water [this]
+    (:water this))
+
+  (get-energy [this]
+    (:energy this))
+
+  (get-current-simulation-time [this]
+    (:simulation-time this))
+
+  (inc-simulation-time [this amount]
+    (set! simulation-time (+ simulation-time amount)))
+
+  (update-water [this]))
 
 (defn create-timer
   [tick-time canvas]
