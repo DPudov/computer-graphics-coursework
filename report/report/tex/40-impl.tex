@@ -42,6 +42,31 @@ Swing предоставляет широкий набор компоненто�
 Все конфигурации для сборки приложения, запуска REPL и описания зависимостей управляются с помощью
 этого модуля.
 
+\section{Листинги кода}
+
+В листинге \ref{lst:config} указана конфигурация сборки проекта на языке Clojure.
+
+\begin{lstlisting}[
+                basicstyle={\fontsize{9}{10}\ttfamily},
+                mathescape=true,
+                showstringspaces=false,
+                tabsize=2,
+                flexiblecolumns=true,
+                language={Clojure},
+                label={lst:config}
+            ]
+            (defproject computer-graphics-coursework-backend "0.1.0-SNAPSHOT"
+              :description "Pudov's computer graphics coursework"
+              :url "https://github.com/DPudov"
+              :license {:name "Eclipse Public License"
+                        :url  "http://www.eclipse.org/legal/epl-v10.html"}
+              :dependencies [[org.clojure/clojure "1.10.0"]
+                             [seesaw "1.5.0"]]
+              :repl-options {:init-ns computer_graphics_coursework_backend.core}
+              :main computer_graphics_coursework_backend.core
+              :profiles {:uberjar {:aot :all}}
+              :java-cmd "/usr/lib/jvm/java-1.11.0-openjdk-amd64/bin/java")
+\end{lstlisting}
 % вывод по разделу
 \section{Вывод}
 
