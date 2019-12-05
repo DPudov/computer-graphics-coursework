@@ -13,6 +13,14 @@
 
 (def desired-fps 30)
 
+(def terrain-noise 5)
+
+(def hue-noise 3)
+
+(def saturation-noise 3)
+
+
+
 (defn time-ms-by-fps
   [fps]
   (/ 1000 fps))
@@ -25,25 +33,69 @@
   (inc-simulation-time [this amount])
   (update-water [this]))
 
-(defrecord Scene
-  [terrain water energy simulation-time]
-  SceneAPI
-  (get-terrain [this]
-    (:terrain this))
+(defn wall-level
+  [dim]
+  (* dim 100))
 
-  (get-water [this]
-    (:water this))
+(defn parabolic-height
+  [dim i j]
+  (- (* 0.4 dim) (* 0.02 (+ (* (- i (/ dim 2)) (- i (/ dim 2))) (* (- j (/ dim 2)) (- j (/ dim 2)))))))
 
-  (get-energy [this]
-    (:energy this))
+(defn fade
+  [t]
+  (* t t t (+ (* t (- (* t 6) 15)) 10)))
 
-  (get-current-simulation-time [this]
-    (:simulation-time this))
+(defn lerp
+  [t a b] (+ a (* t (- b a))))
 
-  (inc-simulation-time [this amount]
-    (set! simulation-time (+ simulation-time amount)))
+(defn grad
+  [^int hash x y z]
+  (let [h (bit-and hash 15)
+        u (if (< h 8) x y)
+        v (if (< h 4) y (if (or (= h 12) (= h 14)) x z))]
+    (+ (if (= (bit-and h 1) 0) x z)
+       (if (= (bit-and h 2) 0) v (- v)))))
 
-  (update-water [this]))
+(defn noise
+  [x y z])
+
+
+
+
+
+(defn noised-height
+  [dim i j terrain-noise]
+  (* 0.5 dim (+ -0.5 (noise (/ (* terrain-noise i) dim)
+                            (/ (* terrain-noise j) dim)
+                            100))))
+
+(defn calculate-height
+  [parabolic noised]
+  (max 0
+       (int (+ parabolic noised))))
+
+(deftype Terrain
+  [dim level-matrix])
+;
+;(deftype Scene
+;  [terrain water energy simulation-time]
+;  SceneAPI
+;  (get-terrain [this]
+;    (:terrain this))
+;
+;  (get-water [this]
+;    (:water this))
+;
+;  (get-energy [this]
+;    (:energy this))
+;
+;  (get-current-simulation-time [this]
+;    (:simulation-time this))
+;
+;  (inc-simulation-time [this amount]
+;    (set! simulation-time (+ simulation-time amount)))
+;
+;  (update-water [this]))
 
 (defn create-timer
   [tick-time canvas]
