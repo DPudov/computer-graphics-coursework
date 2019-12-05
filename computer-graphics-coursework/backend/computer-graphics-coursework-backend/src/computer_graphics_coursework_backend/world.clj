@@ -39,7 +39,10 @@
 
 (defn parabolic-height
   [dim i j]
-  (- (* 0.4 dim) (* 0.02 (+ (* (- i (/ dim 2)) (- i (/ dim 2))) (* (- j (/ dim 2)) (- j (/ dim 2)))))))
+  (- (* 0.4 dim) (* 0.02 (+ (* (- i (/ dim 2))
+                               (- i (/ dim 2)))
+                            (* (- j (/ dim 2))
+                               (- j (/ dim 2)))))))
 
 (defn fade
   [t]
@@ -52,7 +55,9 @@
   [^int hash x y z]
   (let [h (bit-and hash 15)
         u (if (< h 8) x y)
-        v (if (< h 4) y (if (or (= h 12) (= h 14)) x z))]
+        v (if (< h 4) y
+                      (if (or (= h 12)
+                              (= h 14)) x z))]
     (+ (if (= (bit-and h 1) 0) x z)
        (if (= (bit-and h 2) 0) v (- v)))))
 
