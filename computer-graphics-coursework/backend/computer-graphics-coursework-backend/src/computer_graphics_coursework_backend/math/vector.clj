@@ -1,4 +1,4 @@
-(ns computer_graphics_coursework_backend.vector
+(ns computer_graphics_coursework_backend.math.vector
   (:import (clojure.lang Counted Sequential Associative MapEntry Seqable ILookup IFn)
            (java.io Writer)))
 
@@ -432,3 +432,10 @@
 
 (defmethod print-dup Vector4D [^Vector4D v ^Writer w]
   (.write w (.toString v)))
+
+(defn is-outside [v]
+  (let [x (v 0)
+        y (v 1)
+        z (v 2)
+        w (v 3)]
+    (or (< x (- w)) (> x w) (< y (- w)) (> y w) (< z (- w)) (> z w))))

@@ -1,6 +1,6 @@
-(ns computer_graphics_coursework_backend.matrix
-  (:require [computer_graphics_coursework_backend.vector :as vec])
-  (:import (computer_graphics_coursework_backend.vector Vector2D Vector3D Vector4D)
+(ns computer_graphics_coursework_backend.math.matrix
+  (:require [computer_graphics_coursework_backend.math.vector :as vec])
+  (:import (computer_graphics_coursework_backend.math.vector Vector2D Vector3D Vector4D)
            (java.io Writer)
            (clojure.lang MapEntry IFn ILookup Associative Counted Sequential Seqable)))
 
@@ -697,3 +697,29 @@
 
 (defmethod print-dup Matrix4D [^Matrix4D v ^Writer w]
   (.write w (.toString v)))
+
+(defn translate-mat4
+  [v]
+  (Matrix4D. 1 0 0 (v 0)
+             0 1 0 (v 1)
+             0 0 1 (v 2)
+             0 0 0 1))
+
+(defn scale-mat4
+  [v]
+  (Matrix4D. (v 0) 0 0 0
+             0 (v 1) 0 0
+             0 0 (v 2) 0
+             0 0 0 1))
+
+(defn rotate-mat4
+  [v ^double angle]
+  (let [n (vec/normalize v)
+        s (Math/sin angle)
+        c (Math/cos angle)
+        m (- 1 c)]
+    (Matrix4D. (+ (* m (n 0) (n 0)) c), (+ (* m (n 0) (n 1)) (* (n 2) s)), (- (* m (n 2) (n 0)) (* (n 1) s)), 0,
+               (- (* m (n 0) (n 1)) (* (n 2) s)), (+ (* m (n 1) (n 1)) c), (+ (* m (n 1) (n 2)) (* (n 0) s)), 0,
+               (+ (* m (n 2) (n 0)) (* (n 1) s)), (- (* m (n 1) (n 2)) (* (n 0) s)), (+ (* m (n 2) (n 2)) c), 0,
+               0, 0, 0, 1)))
+
