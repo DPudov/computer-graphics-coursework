@@ -1,4 +1,4 @@
-(ns computer_graphics_coursework_backend.display
+(ns computer_graphics_coursework_backend.ui.display
   (:use seesaw.core
         seesaw.graphics
         seesaw.color)

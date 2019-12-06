@@ -1,7 +1,7 @@
 (ns computer_graphics_coursework_backend.core
-  (:require [computer_graphics_coursework_backend.controller :as controls]
-            [computer_graphics_coursework_backend.display :as display]
-            [computer_graphics_coursework_backend.world :as world]))
+  (:require [computer_graphics_coursework_backend.ui.controller :as controls]
+            [computer_graphics_coursework_backend.ui.display :as display]
+            [computer_graphics_coursework_backend.world.world :as world]))
 
 
 (def max-fps 60)

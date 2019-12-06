@@ -1,4 +1,4 @@
-(ns computer_graphics_coursework_backend.drawer
+(ns computer_graphics_coursework_backend.render.drawer
   (:require [computer_graphics_coursework_backend.vector :as vec])
   (:import java.awt.image.BufferedImage
            (computer_graphics_coursework_backend.vector Vector3D Vector2D)

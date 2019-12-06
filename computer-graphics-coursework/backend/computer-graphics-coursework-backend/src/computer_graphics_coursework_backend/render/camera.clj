@@ -1,4 +1,4 @@
-(ns computer_graphics_coursework_backend.camera)
+(ns computer_graphics_coursework_backend.render.camera)
 
 (definterface Viewable
   (getPosition [])

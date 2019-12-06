@@ -1,6 +1,6 @@
-(ns computer-graphics-coursework-backend.engine
-  (:require [computer_graphics_coursework_backend.vector :as vec]
-            [computer_graphics_coursework_backend.matrix :as matr]))
+(ns computer-graphics-coursework-backend.render.engine
+  (:require [computer_graphics_coursework_backend.math.vector :as vec]
+            [computer_graphics_coursework_backend.math.matrix :as matr]))
 
 (defn render
   [canvas]
