@@ -54,7 +54,7 @@
   [t a b] (+ a (* t (- b a))))
 
 (defn grad
-  [^int hash x y z]
+  [hash x y z]
   (let [h (bit-and hash 15)
         u (if (< h 8) x y)
         v (if (< h 4) y
@@ -63,28 +63,30 @@
     (+ (if (= (bit-and h 1) 0) x z)
        (if (= (bit-and h 2) 0) v (- v)))))
 
-(def p (vector 151, 160, 137, 91, 90, 15,
-               131, 13, 201, 95, 96, 53, 194, 233, 7, 225, 140, 36, 103, 30, 69, 142, 8, 99, 37, 240, 21, 10, 23,
-               190, 6, 148, 247, 120, 234, 75, 0, 26, 197, 62, 94, 252, 219, 203, 117, 35, 11, 32, 57, 177, 33,
-               88, 237, 149, 56, 87, 174, 20, 125, 136, 171, 168, 68, 175, 74, 165, 71, 134, 139, 48, 27, 166,
-               77, 146, 158, 231, 83, 111, 229, 122, 60, 211, 133, 230, 220, 105, 92, 41, 55, 46, 245, 40, 244,
-               102, 143, 54, 65, 25, 63, 161, 1, 216, 80, 73, 209, 76, 132, 187, 208, 89, 18, 169, 200, 196,
-               135, 130, 116, 188, 159, 86, 164, 100, 109, 198, 173, 186, 3, 64, 52, 217, 226, 250, 124, 123,
-               5, 202, 38, 147, 118, 126, 255, 82, 85, 212, 207, 206, 59, 227, 47, 16, 58, 17, 182, 189, 28, 42,
-               223, 183, 170, 213, 119, 248, 152, 2, 44, 154, 163, 70, 221, 153, 101, 155, 167, 43, 172, 9,
-               129, 22, 39, 253, 19, 98, 108, 110, 79, 113, 224, 232, 178, 185, 112, 104, 218, 246, 97, 228,
-               251, 34, 242, 193, 238, 210, 144, 12, 191, 179, 162, 241, 81, 51, 145, 235, 249, 14, 239, 107,
-               49, 192, 214, 31, 181, 199, 106, 157, 184, 84, 204, 176, 115, 121, 50, 45, 127, 4, 150, 254,
-               138, 236, 205, 93, 222, 114, 67, 29, 24, 72, 243, 141, 128, 195, 78, 66, 215, 61, 156, 180))
+(def permutation (vector 151, 160, 137, 91, 90, 15,
+                         131, 13, 201, 95, 96, 53, 194, 233, 7, 225, 140, 36, 103, 30, 69, 142, 8, 99, 37, 240, 21, 10, 23,
+                         190, 6, 148, 247, 120, 234, 75, 0, 26, 197, 62, 94, 252, 219, 203, 117, 35, 11, 32, 57, 177, 33,
+                         88, 237, 149, 56, 87, 174, 20, 125, 136, 171, 168, 68, 175, 74, 165, 71, 134, 139, 48, 27, 166,
+                         77, 146, 158, 231, 83, 111, 229, 122, 60, 211, 133, 230, 220, 105, 92, 41, 55, 46, 245, 40, 244,
+                         102, 143, 54, 65, 25, 63, 161, 1, 216, 80, 73, 209, 76, 132, 187, 208, 89, 18, 169, 200, 196,
+                         135, 130, 116, 188, 159, 86, 164, 100, 109, 198, 173, 186, 3, 64, 52, 217, 226, 250, 124, 123,
+                         5, 202, 38, 147, 118, 126, 255, 82, 85, 212, 207, 206, 59, 227, 47, 16, 58, 17, 182, 189, 28, 42,
+                         223, 183, 170, 213, 119, 248, 152, 2, 44, 154, 163, 70, 221, 153, 101, 155, 167, 43, 172, 9,
+                         129, 22, 39, 253, 19, 98, 108, 110, 79, 113, 224, 232, 178, 185, 112, 104, 218, 246, 97, 228,
+                         251, 34, 242, 193, 238, 210, 144, 12, 191, 179, 162, 241, 81, 51, 145, 235, 249, 14, 239, 107,
+                         49, 192, 214, 31, 181, 199, 106, 157, 184, 84, 204, 176, 115, 121, 50, 45, 127, 4, 150, 254,
+                         138, 236, 205, 93, 222, 114, 67, 29, 24, 72, 243, 141, 128, 195, 78, 66, 215, 61, 156, 180))
+
+(def p (vec (concat permutation permutation)))
 
 (defn noise
-  [x y z]
-  (let [x-floor (int (Math/floor x))
-        y-floor (int (Math/floor y))
-        z-floor (int (Math/floor z))
-        ^int X (bit-and x-floor perlin-mask)
-        ^int Y (bit-and y-floor perlin-mask)
-        ^int Z (bit-and z-floor perlin-mask)
+  [^double x ^double y ^double z]
+  (let [x-floor (Math/floor x)
+        y-floor (Math/floor y)
+        z-floor (Math/floor z)
+        X (bit-and (int x-floor) perlin-mask)
+        Y (bit-and (int y-floor) perlin-mask)
+        Z (bit-and (int z-floor) perlin-mask)
         x-relative (- x x-floor)
         y-relative (- y y-floor)
         z-relative (- z z-floor)
@@ -93,25 +95,25 @@
         w (fade z-relative)
         A (+ (p X) Y)
         AA (+ (p A) Z)
-        AB (+ (p (+ A 1) Z))
+        AB (+ (p (+ A 1)) Z)
         B (+ (p (+ X 1)) Y)
         BA (+ (p B) Z)
         BB (+ (p (+ B 1)) Z)]
     (lerp w
           (lerp v
                 (lerp u
-                      (grad (p AA) x y z)
-                      (grad (p BA) (- x 1) y z))
+                      (grad (p AA) x-relative y-relative z-relative)
+                      (grad (p BA) (- x-relative 1) y-relative z-relative))
                 (lerp u
-                      (grad (p AB) x (- y 1) z)
-                      (grad (p BB) (- x 1) (- y 1) z)))
+                      (grad (p AB) x-relative (- y-relative 1) z-relative)
+                      (grad (p BB) (- x-relative 1) (- y-relative 1) z-relative)))
           (lerp v
                 (lerp u
-                      (grad (p (+ AA 1)) x y (- z 1))
-                      (grad (p (+ BA 1)) (- x 1) y (- z 1)))
+                      (grad (p (+ AA 1)) x-relative y-relative (- z-relative 1))
+                      (grad (p (+ BA 1)) (- x-relative 1) y-relative (- z-relative 1)))
                 (lerp u
-                      (grad (p (+ AB 1)) x (- y 1) (- z 1))
-                      (grad (p (+ BB 1)) (- x 1) (- y 1) (- z 1)))))))
+                      (grad (p (+ AB 1)) x-relative (- y-relative 1) (- z-relative 1))
+                      (grad (p (+ BB 1)) (- x-relative 1) (- y-relative 1) (- z-relative 1)))))))
 
 (defn noised-height
   [dim i j terrain-noise]
@@ -133,11 +135,12 @@
       (dotimes [j dim]
         (if (not (or (= i 0) (= i (- dim 1) (= j 0) (= j (- dim 1)))))
           (aset terrain i j
-                (calculate-height (parabolic-height dim i j)
-                                  (noised-height dim i j terrain-noise))))))
+                (int (calculate-height (parabolic-height dim i j)
+                                       (noised-height dim i j terrain-noise))))
+          (aset terrain i j
+                (int (* 100 dim))))))
     terrain))
 
-(def terrain (init-terrain 500))
 
 (defn hsb-to-rgb
   [hue saturation brightness]
@@ -161,22 +164,27 @@
   [canvas width]
   (let [dim 500
         voxel-width (/ width dim)
-        w2 (/ width 2)]
+        w2 (/ width 2)
+        terrain (init-terrain 500)]
     (dotimes [i dim]
       (dotimes [j dim]
-        (dotimes [k (terrain i j)]
-          (let [hue (int (* 50 (noise (/ (* hue-noise i) dim)
-                                      (/ (* hue-noise j) dim)
-                                      (/ (* hue-noise k) dim))))
-                saturation (int (+ 50 (* 100 (noise (+ 1000 (/ (* saturation-noise i) dim))
-                                                    (/ (* saturation-noise j) dim)
-                                                    (/ (* saturation-noise k) dim)))))
-                brightness 150
-                stroke-color (hsb-to-rgb hue saturation brightness)]
-            (push-matrix)
-            (fill stroke-color)
-            (translate (+ (- w2) (* i voxel-width)))
-            (pop-matrix)))))))
+          (println terrain)
+          (dotimes [k (aget terrain i j)]
+            (let [hue (int (* 50 (noise (/ (* hue-noise i) dim)
+                                        (/ (* hue-noise j) dim)
+                                        (/ (* hue-noise k) dim))))
+                  saturation (int (+ 50 (* 100 (noise (+ 1000 (/ (* saturation-noise i) dim))
+                                                      (/ (* saturation-noise j) dim)
+                                                      (/ (* saturation-noise k) dim)))))
+                  brightness 150
+                  stroke-color (hsb-to-rgb hue saturation brightness)]
+              (println "voxel")))))))
+              ;todo write terrain render))))))
+
+;(push-matrix)
+;(fill stroke-color)
+;(translate (+ (- w2) (* i voxel-width)))
+;(pop-matrix)))))))
 
 
 ;

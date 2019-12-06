@@ -43,7 +43,7 @@
                   (recur (inc xi) yi (- error delta-y)))))))))))
 
 (defn draw-voxel
-  [^BufferedImage image-buffer ])
+  [^BufferedImage image-buffer])
 
 
 
