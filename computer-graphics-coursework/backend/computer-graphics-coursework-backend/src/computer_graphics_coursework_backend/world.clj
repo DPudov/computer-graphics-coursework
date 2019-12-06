@@ -124,8 +124,20 @@
   (max 0
        (int (+ parabolic noised))))
 
-(deftype Terrain
-  [dim level-matrix])
+
+(defn init-terrain
+  [dim]
+  (let
+    [terrain (make-array Integer/TYPE dim dim)]
+    (dotimes [i dim]
+      (dotimes [j dim]
+        (if (not (or (= i 0) (= i (- dim 1) (= j 0) (= j (- dim 1)))))
+          (aset terrain i j
+                (calculate-height (parabolic-height dim i j)
+                                  (noised-height dim i j terrain-noise))))))))
+
+
+
 ;
 ;(deftype Scene
 ;  [terrain water energy simulation-time]
