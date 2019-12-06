@@ -134,8 +134,49 @@
         (if (not (or (= i 0) (= i (- dim 1) (= j 0) (= j (- dim 1)))))
           (aset terrain i j
                 (calculate-height (parabolic-height dim i j)
-                                  (noised-height dim i j terrain-noise))))))))
+                                  (noised-height dim i j terrain-noise))))))
+    terrain))
 
+(def terrain (init-terrain 500))
+
+(defn hsb-to-rgb
+  [hue saturation brightness]
+  (Color/HSBtoRGB hue saturation brightness))
+;(defn color-rgb-from-hsv
+;  [hue saturation value]
+;  (let [hi (mod (int (/ hue 60)) 6)
+;        v-min (/ (* (- 100 saturation) value) 100)
+;        a (* (- value v-min) (/ (mod hue 60) 60))
+;        v-inc (+ v-min a)
+;        v-dec (- value a)]
+;    (cond
+;      (= hi 0) 2
+;      (= hi 1) 1 2
+;      (= hi 2) 1 2
+;      (= hi 3) 1 2
+;      (= hi 4) 1 2
+;      (= hi 5) 1 2)))
+
+(defn render-to
+  [canvas width]
+  (let [dim 500
+        voxel-width (/ width dim)
+        w2 (/ width 2)]
+    (dotimes [i dim]
+      (dotimes [j dim]
+        (dotimes [k (terrain i j)]
+          (let [hue (int (* 50 (noise (/ (* hue-noise i) dim)
+                                      (/ (* hue-noise j) dim)
+                                      (/ (* hue-noise k) dim))))
+                saturation (int (+ 50 (* 100 (noise (+ 1000 (/ (* saturation-noise i) dim))
+                                                    (/ (* saturation-noise j) dim)
+                                                    (/ (* saturation-noise k) dim)))))
+                brightness 150
+                stroke-color (hsb-to-rgb hue saturation brightness)]
+            (push-matrix)
+            (fill stroke-color)
+            (translate (+ (- w2) (* i voxel-width)))
+            (pop-matrix)))))))
 
 
 ;
@@ -169,7 +210,7 @@
   (let [w (.getWidth c) w2 (/ w 2)
         h (.getHeight c) h2 (/ h 2)
         canvas (BufferedImage. w h BufferedImage/TYPE_INT_ARGB)]
-    ()
+    (render-to canvas w)
     (.drawImage g canvas nil nil)))
 
 
