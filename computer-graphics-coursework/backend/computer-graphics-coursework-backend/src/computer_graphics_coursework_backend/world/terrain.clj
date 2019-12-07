@@ -1,5 +1,24 @@
 (ns computer-graphics-coursework-backend.world.terrain
-  (:require [computer-graphics-coursework-backend.world.perlin :as perlin]))
+  (:require [computer-graphics-coursework-backend.world.perlin :as perlin])
+  (:import (java.awt Color)))
+
+
+(defn hsb-to-rgb
+  [hue saturation brightness]
+  (Color/HSBtoRGB hue saturation brightness))
+
+(def matrix-stack
+  '())
+
+(def matrix-context)
+
+(defn push-matrix []
+  (conj matrix-stack matrix-context))
+
+(defn pop-matrix []
+  (var-set matrix-context (peek matrix-stack))
+  (var-set matrix-stack (pop matrix-stack)))
+
 (def terrain-noise 5)
 
 (def hue-noise 3)

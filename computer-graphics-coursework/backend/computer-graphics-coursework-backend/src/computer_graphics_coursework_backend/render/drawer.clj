@@ -1,7 +1,7 @@
 (ns computer_graphics_coursework_backend.render.drawer
-  (:require [computer_graphics_coursework_backend.vector :as vec])
+  (:require [computer_graphics_coursework_backend.math.vector :as vec])
   (:import java.awt.image.BufferedImage
-           (computer_graphics_coursework_backend.vector Vector3D Vector2D)
+           (computer_graphics_coursework_backend.math.vector Vector3D Vector2D)
            (java.awt Color)))
 (def width 640)
 
@@ -16,6 +16,17 @@
         y (int (.getY point))]
     (if (and (> x 0) (< x width) (> y 0) (< y height))
       (put-pixel image-buffer x y color))))
+
+(defn draw-line-fast
+  [^BufferedImage image-buffer xb yb xe ye ^Color color]
+  (let [g (.createGraphics image-buffer)]
+    (.setColor g color)
+    (.drawLine g xb yb xe ye)))
+    ;(-> g
+    ;    (.setBackground Color/CYAN)
+    ;    (println image-buffer xb yb xe ye color))))
+        ;(.setStroke color)
+        ;(.drawLine xb yb xe ye))))
 
 (defn draw-line
   [^BufferedImage image-buffer xb yb xe ye ^Color color]

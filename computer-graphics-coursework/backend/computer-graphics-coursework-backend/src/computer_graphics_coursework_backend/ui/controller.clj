@@ -1,4 +1,4 @@
-(ns computer_graphics_coursework_backend.controller
+(ns computer_graphics_coursework_backend.ui.controller
     (:import [javax.swing JFrame JLabel JButton]))
 
 (defn get-time
