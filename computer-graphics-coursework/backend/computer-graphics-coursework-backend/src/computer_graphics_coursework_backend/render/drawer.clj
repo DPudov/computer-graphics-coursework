@@ -19,7 +19,7 @@
 
 (defn draw-line-fast
   [^BufferedImage image-buffer xb yb xe ye ^Color color]
-  (let [g (.createGraphics image-buffer)]
+  (let [g (.getGraphics image-buffer)]
     (.setColor g color)
     (.drawLine g xb yb xe ye)))
     ;(-> g

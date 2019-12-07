@@ -35,9 +35,19 @@
 (def Vw 50)
 (def Vh 50)
 (def d 10)
-(def camera-position (Vector4D. 3 10 0 1))
-(def camera-orientation (Vector4D. 0.1 0.3 0.2 1))
+(def camera-position (atom (Vector4D. 3 -10 -1 1)))
+(def camera-orientation (Vector4D. 0 0 0 1))
 (def display-surface (Vector4D. 0 0 1 1))
+
+(defn rotate-camera
+  [camera-position angle]
+  (let [theta-x (angle 0)
+        theta-y (angle 1)
+        theta-z (angle 2)]
+    (matr/transform (matr/mult (matr/rotate-x theta-x)
+                               (matr/rotate-y theta-y)
+                               (matr/rotate-z theta-z))
+                    camera-position)))
 
 (defn get-d
   "Camera orientation in radians!"
@@ -58,7 +68,8 @@
         dx (camera-distance-d 0)
         dy (camera-distance-d 1)
         dz (camera-distance-d 2)]
-    (vec [(- (+ (/ (* ez dx 1000) dz 50) ex)) (- (+ (/ (* ez dy 600) dz 50) ey))])))
+    (if (< (Math/abs dz) 0.00001) (vec [0 0])
+                                  (vec [(+ (/ (* dx 1000) dz 30) 500) (+ (/ (* dy 600) dz 30) 300)]))))
 ;(defn viewport-to-canvas
 ;  [x y]
 ;  [(/ (* x Cw) Vw) (/ (* y Ch) Vh)])
@@ -76,10 +87,8 @@
 (def vCb (Vector4D. 1 -1 2 1))
 (def vDb (Vector4D. -1 -1 2 1))
 
-(def vertices)
-
 (defn draw-cube
-  [canvas]
+  [canvas camera-position]
   (let [vafp (get-screen-point display-surface (get-d camera-orientation camera-position vAf))
         vbfp (get-screen-point display-surface (get-d camera-orientation camera-position vBf))
         vcfp (get-screen-point display-surface (get-d camera-orientation camera-position vCf))
@@ -88,8 +97,7 @@
         vbbp (get-screen-point display-surface (get-d camera-orientation camera-position vBb))
         vcbp (get-screen-point display-surface (get-d camera-orientation camera-position vCb))
         vdbp (get-screen-point display-surface (get-d camera-orientation camera-position vDb))]
-    (println vafp vbfp vcfp vdfp)
-    (drawer/draw-line-fast canvas (int (vafp 0)) (int (vafp 1)) (int (vbfp 0)) (int (vbfp 1)) Color/BLUE)
+    (drawer/draw-line-fast canvas (vafp 0) (vafp 1) (vbfp 0) (vbfp 1) Color/BLUE)
     (drawer/draw-line-fast canvas (vbfp 0) (vbfp 1) (vcfp 0) (vcfp 1) Color/BLUE)
     (drawer/draw-line-fast canvas (vcfp 0) (vcfp 1) (vdfp 0) (vdfp 1) Color/BLUE)
     (drawer/draw-line-fast canvas (vdfp 0) (vdfp 1) (vafp 0) (vafp 1) Color/BLUE)
@@ -131,21 +139,32 @@
 
 (defn create-timer
   [tick-time canvas]
-  (Timer. tick-time (reify ActionListener
-                      (actionPerformed [this e]
-                        (.repaint canvas)))))
+  (let [delta-angle (vec/Vector3D. 0 5 0)]
+    (Timer. tick-time (reify ActionListener
+                        (actionPerformed [this e]
+                          (swap! camera-position rotate-camera delta-angle)
+                          (.repaint canvas))))))
+
+(defn clear [canvas]
+  (let [g (.getGraphics canvas)
+        w (.getWidth canvas)
+        h (.getHeight canvas)]
+    (.setBackground g Color/WHITE)
+    (.clearRect g 0 0 w h)))
+
 
 (defn paint-frame [c g]
   (let [w (.getWidth c) w2 (/ w 2)
         h (.getHeight c) h2 (/ h 2)
         canvas (BufferedImage. w h BufferedImage/TYPE_INT_ARGB)]
-    (draw-cube canvas)                                      ;(terrain/render-to canvas w))
+    (clear canvas)
+    (draw-cube canvas @camera-position)                     ;(terrain/render-to canvas w))
     (.drawImage g canvas nil nil)))
 
 
 
 (defn generate-world [root]
   (let [canvas (select root [:#canvas])]
-    (create-timer (time-ms-by-fps desired-fps) canvas)
+    (.start (create-timer (time-ms-by-fps desired-fps) canvas))
     (-> canvas
         (config! :paint paint-frame))))
