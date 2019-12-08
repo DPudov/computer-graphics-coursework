@@ -69,6 +69,7 @@
 (defn create-canvas [background]
   (canvas :id :canvas
           :background background
+          :focusable? true
           :paint nil))
 
 

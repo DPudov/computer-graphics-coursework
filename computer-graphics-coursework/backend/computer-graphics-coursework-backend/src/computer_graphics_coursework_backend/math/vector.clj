@@ -249,7 +249,7 @@
              (* (.getY v) f)
              (* (.getZ v) f)))
 
-(defn- dot-3d [^Vector3D v1 ^Vector3D v2]
+(defn- dot-3d [v1 v2]
   (+ (* (.getX v1) (.getX v2))
      (* (.getY v1) (.getY v2))
      (* (.getZ v1) (.getZ v2))))
@@ -290,7 +290,7 @@
              (* (.getZ v) f)
              (* (.getW v) f)))
 
-(defn- dot-4d [^Vector4D v1 ^Vector4D v2]
+(defn dot-4d [^Vector4D v1 ^Vector4D v2]
   (+ (* (.getX v1) (.getX v2))
      (* (.getY v1) (.getY v2))
      (* (.getZ v1) (.getZ v2))
@@ -373,7 +373,7 @@
 
 (defn cross
   "Find the cross-product of two 3D vectors."
-  [^Vector3D v1 ^Vector3D v2]
+  [v1 v2]
   (Vector3D. (- (* (.getY v1) (.getZ v2))
                 (* (.getZ v1) (.getY v2)))
              (- (* (.getZ v1) (.getX v2))

@@ -5,14 +5,16 @@
   (:require [computer_graphics_coursework_backend.math.vector :as vec]
             [computer_graphics_coursework_backend.math.matrix :as matr]
             [computer-graphics-coursework-backend.render.engine :as engine]
+            [computer_graphics_coursework_backend.render.camera :as camera]
             [computer_graphics_coursework_backend.render.drawer :as drawer]
             [computer-graphics-coursework-backend.world.terrain :as terrain]
             [computer-graphics-coursework-backend.world.perlin :as perlin])
   (:import (java.awt.image BufferedImage)
            (java.awt Color)
            (javax.swing Timer)
-           (java.awt.event ActionListener)
-           (computer_graphics_coursework_backend.math.vector Vector3D Vector4D)))
+           (java.awt.event ActionListener KeyEvent)
+           (computer_graphics_coursework_backend.math.vector Vector3D Vector4D)
+           (computer_graphics_coursework_backend.math.matrix Matrix4D)))
 
 (def desired-fps 30)
 
@@ -30,73 +32,35 @@
   (inc-simulation-time [this amount])
   (update-water [this]))
 
-(def Cw 1000)
-(def Ch 600)
-(def Vw 50)
-(def Vh 50)
-(def d 10)
-(def camera-position (atom (Vector4D. 3 -10 -1 1)))
-(def camera-orientation (Vector4D. 0 0 0 1))
-(def display-surface (Vector4D. 0 0 1 1))
 
-(defn rotate-camera
-  [camera-position angle]
-  (let [theta-x (angle 0)
-        theta-y (angle 1)
-        theta-z (angle 2)]
-    (matr/transform (matr/mult (matr/rotate-x theta-x)
-                               (matr/rotate-y theta-y)
-                               (matr/rotate-z theta-z))
-                    camera-position)))
-
-(defn get-d
-  "Camera orientation in radians!"
-  [camera-orientation camera-position vertex]
-  (let [theta-x (camera-orientation 0)
-        theta-y (camera-orientation 1)
-        theta-z (camera-orientation 2)]
-    (matr/transform (matr/mult (matr/rotate-x theta-x)
-                               (matr/rotate-y theta-y)
-                               (matr/rotate-z theta-z))
-                    (vec/sub vertex camera-position))))
-
-(defn get-screen-point
-  [display-surface-e camera-distance-d]
-  (let [ex (display-surface-e 0)
-        ey (display-surface-e 1)
-        ez (display-surface-e 2)
-        dx (camera-distance-d 0)
-        dy (camera-distance-d 1)
-        dz (camera-distance-d 2)]
-    (if (< (Math/abs dz) 0.00001) (vec [0 0])
-                                  (vec [(+ (/ (* dx 1000) dz 30) 500) (+ (/ (* dy 600) dz 30) 300)]))))
-;(defn viewport-to-canvas
-;  [x y]
-;  [(/ (* x Cw) Vw) (/ (* y Ch) Vh)])
-;
-;(defn project-vertex
-;  [v]
-;  (viewport-to-canvas (/ (* (v 0) d) (v 2)) (/ (* (v 1) d) (v 2))))
-
+(def model-matrix
+  (Matrix4D. 1.0 0.0 0.0 0.0
+             0.0 1.0 0.0 0.0
+             0.0 0.0 1.0 0.0
+             0.0 0.0 0.0 1.0))
 (def vAf (Vector4D. -1 1 1 1))
 (def vBf (Vector4D. 1 1 1 1))
 (def vCf (Vector4D. 1 -1 1 1))
 (def vDf (Vector4D. -1 -1 1 1))
-(def vAb (Vector4D. -1 1 2 1))
-(def vBb (Vector4D. 1 1 2 1))
-(def vCb (Vector4D. 1 -1 2 1))
-(def vDb (Vector4D. -1 -1 2 1))
+(def vAb (Vector4D. -1 1 3 1))
+(def vBb (Vector4D. 1 1 3 1))
+(def vCb (Vector4D. 1 -1 3 1))
+(def vDb (Vector4D. -1 -1 3 1))
 
-(defn draw-cube
+(defn draw-cube-another
   [canvas camera-position]
-  (let [vafp (get-screen-point display-surface (get-d camera-orientation camera-position vAf))
-        vbfp (get-screen-point display-surface (get-d camera-orientation camera-position vBf))
-        vcfp (get-screen-point display-surface (get-d camera-orientation camera-position vCf))
-        vdfp (get-screen-point display-surface (get-d camera-orientation camera-position vDf))
-        vabp (get-screen-point display-surface (get-d camera-orientation camera-position vAb))
-        vbbp (get-screen-point display-surface (get-d camera-orientation camera-position vBb))
-        vcbp (get-screen-point display-surface (get-d camera-orientation camera-position vCb))
-        vdbp (get-screen-point display-surface (get-d camera-orientation camera-position vDb))]
+  (let [mvp (camera/model-view-projection-matrix camera/perspective
+                                                 (camera/view-matrix camera-position @camera/target camera/up)
+                                                 model-matrix)
+        viewport [(.getWidth canvas) (.getHeight canvas)]
+        vafp (camera/project-to-screen vAf mvp viewport)
+        vbfp (camera/project-to-screen vBf mvp viewport)
+        vcfp (camera/project-to-screen vCf mvp viewport)
+        vdfp (camera/project-to-screen vDf mvp viewport)
+        vabp (camera/project-to-screen vAb mvp viewport)
+        vbbp (camera/project-to-screen vBb mvp viewport)
+        vcbp (camera/project-to-screen vCb mvp viewport)
+        vdbp (camera/project-to-screen vDb mvp viewport)]
     (drawer/draw-line-fast canvas (vafp 0) (vafp 1) (vbfp 0) (vbfp 1) Color/BLUE)
     (drawer/draw-line-fast canvas (vbfp 0) (vbfp 1) (vcfp 0) (vcfp 1) Color/BLUE)
     (drawer/draw-line-fast canvas (vcfp 0) (vcfp 1) (vdfp 0) (vdfp 1) Color/BLUE)
@@ -110,39 +74,12 @@
     (drawer/draw-line-fast canvas (vcfp 0) (vcfp 1) (vcbp 0) (vcbp 1) Color/GREEN)
     (drawer/draw-line-fast canvas (vdfp 0) (vdfp 1) (vdbp 0) (vdbp 1) Color/GREEN)))
 
-;(push-matrix)
-;(fill stroke-color)
-;(translate (+ (- w2) (* i voxel-width)))
-;(pop-matrix)))))))
-
-
-;
-;(deftype Scene
-;  [terrain water energy simulation-time]
-;  SceneAPI
-;  (get-terrain [this]
-;    (:terrain this))
-;
-;  (get-water [this]
-;    (:water this))
-;
-;  (get-energy [this]
-;    (:energy this))
-;
-;  (get-current-simulation-time [this]
-;    (:simulation-time this))
-;
-;  (inc-simulation-time [this amount]
-;    (set! simulation-time (+ simulation-time amount)))
-;
-;  (update-water [this]))
-
 (defn create-timer
   [tick-time canvas]
-  (let [delta-angle (vec/Vector3D. 0 5 0)]
+  (let [delta-angle (Vector3D. 0 0.5 0)]
     (Timer. tick-time (reify ActionListener
                         (actionPerformed [this e]
-                          (swap! camera-position rotate-camera delta-angle)
+                          (swap! camera/camera-position camera/rotate-camera delta-angle)
                           (.repaint canvas))))))
 
 (defn clear [canvas]
@@ -158,13 +95,38 @@
         h (.getHeight c) h2 (/ h 2)
         canvas (BufferedImage. w h BufferedImage/TYPE_INT_ARGB)]
     (clear canvas)
-    (draw-cube canvas @camera-position)                     ;(terrain/render-to canvas w))
+    (draw-cube-another canvas @camera/camera-position)      ;(terrain/render-to canvas w))
     (.drawImage g canvas nil nil)))
 
 
 
 (defn generate-world [root]
-  (let [canvas (select root [:#canvas])]
-    (.start (create-timer (time-ms-by-fps desired-fps) canvas))
+  (let [canvas (select root [:#canvas])
+        timer (create-timer (time-ms-by-fps desired-fps) canvas)]
+    ;(.start timer)
     (-> canvas
-        (config! :paint paint-frame))))
+        ;(.setFocusable true)
+        (request-focus!)
+        (config! :paint paint-frame)
+        (listen :key-pressed
+                (fn [e]
+                  (let [key (.getKeyCode e)]
+                    (cond
+                      (= key KeyEvent/VK_W)
+                      (do
+                        (swap! camera/target camera/move-camera-forward)
+                        (swap! camera/camera-position camera/move-camera-forward))
+                      (= key KeyEvent/VK_A)
+                      (do
+                        (swap! camera/target camera/move-camera-left)
+                        (swap! camera/camera-position camera/move-camera-left))
+                      (= key KeyEvent/VK_S)
+                      (do
+                        (swap! camera/target camera/move-camera-backward)
+                        (swap! camera/camera-position camera/move-camera-backward))
+                      (= key KeyEvent/VK_D)
+                      (do
+                        (swap! camera/target camera/move-camera-right)
+                        (swap! camera/camera-position camera/move-camera-right))))
+                  (.repaint canvas))))))
+
