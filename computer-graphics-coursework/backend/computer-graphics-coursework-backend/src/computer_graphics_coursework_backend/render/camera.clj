@@ -1,9 +1,13 @@
 (ns computer_graphics_coursework_backend.render.camera
   (:require [computer_graphics_coursework_backend.math.matrix :as matr]
-            [computer_graphics_coursework_backend.math.vector :as vec])
-  (:import (computer_graphics_coursework_backend.math.vector Vector4D Vector3D)))
+            [computer_graphics_coursework_backend.math.vector :as vec]
+            [computer_graphics_coursework_backend.render.drawer :as drawer])
 
-(def camera-position (atom (Vector4D. 0 0 -10 1)))
+  (:import (computer_graphics_coursework_backend.math.vector Vector4D Vector3D)
+           (java.awt.image BufferedImage)
+           (java.awt Color)))
+
+(def camera-position (atom (Vector4D. 0 3 -10 1)))
 (def camera-orientation (Vector4D. 0 1 0 1))
 (def camera-target (atom (Vector4D. 0 0 0 1)))
 (def display-surface (Vector4D. 0 0 1 1))
@@ -63,6 +67,23 @@
   [projection view model]
   (matr/mult projection view model))
 
+(defn rotate-camera-ox
+  [camera-position angle]
+  (matr/transform (matr/mult (matr/rotate-x angle))
+                  camera-position))
+
+
+(defn rotate-camera-oy
+  [camera-position angle]
+  (matr/transform (matr/mult (matr/rotate-y angle))
+                  camera-position))
+
+
+(defn rotate-camera-oz
+  [camera-position angle]
+  (matr/transform (matr/mult (matr/rotate-z angle))
+                  camera-position))
+
 (defn rotate-camera
   [camera-position angle]
   (let [theta-x (angle 0)
@@ -71,9 +92,67 @@
     (matr/transform (matr/mult (matr/translate-mat4 (vec/sub @target camera-position))
                                (matr/rotate-x theta-x)
                                (matr/rotate-y theta-y)
-                               (matr/rotate-z theta-z)
-                               (matr/translate-mat4 (vec/sub camera-position @target)))
+                               (matr/rotate-z theta-z))
+                    ;(matr/translate-mat4 (vec/sub camera-position @target)))
                     camera-position)))
+(defn apply-func-to-vec
+  [vec func & args]
+  (reduce (fn [r [k v]] (assoc vec (apply func r args)) vec)))
+
+(defn perspective-divide
+  [point]
+  (let [
+        z (point 2)
+        z-neg (- z)
+        x (point 0)
+        y (point 1)]
+    (Vector4D. (/ x z-neg)
+               (/ y z-neg)
+               z
+               1)))
+
+(defn check-boundaries
+  [point canvas-width canvas-height]
+  (let [x (point 0)
+        y (point 1)]
+    (and (> x 0) (> y 0) (< x canvas-width) (< y canvas-height))))
+
+
+(defn convert-point-to-raster-from-ndc
+  [point width height]
+  (let [x (point 0)
+        y (point 1)
+        z (point 2)
+        w (point 3)]
+    (Vector4D. (* x width)
+               (* y height)
+               z
+               w)))
+
+(defn convert-point-to-ndc-from-screen
+  [point]
+  (let [x (point 0)
+        y (point 1)
+        z (point 2)
+        w (point 3)]
+    (Vector4D. (/ (+ x 1) 2)
+               (/ (+ y 1) 2)
+               (/ (+ z 1) 2)
+               w)))
+
+(defn convert-point-to-raster-from-screen
+  [point width height]
+  (if (check-boundaries point width height)
+    (convert-point-to-raster-from-ndc (convert-point-to-ndc-from-screen point) width height)
+    (Vector4D. 0 0 0 1)))
+
+
+(defn rasterize
+  [^BufferedImage image scene-vertices transformation & args]
+  (let [points-in-camera-space (apply-func-to-vec scene-vertices transformation)
+        points-perspective-divided (apply-func-to-vec points-in-camera-space perspective-divide)
+        points-raster (apply-func-to-vec points-perspective-divided convert-point-to-raster-from-screen)]
+    (doseq [el points-raster] (drawer/draw-point image el Color/BLUE))))
 
 (defn translate-camera
   [camera-position move]

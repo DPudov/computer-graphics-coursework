@@ -1,4 +1,4 @@
-(ns computer-graphics-coursework-backend.render.vertex
+(ns computer_graphics_coursework_backend.render.vertex
   (:require [computer_graphics_coursework_backend.math.vector :as vec]
             [computer-graphics-coursework-backend.render.color :as c])
   (:import (computer_graphics_coursework_backend.math.vector Vector4D Vector3D)
@@ -6,6 +6,10 @@
 
 (defprotocol Outsider
   (is-outside []))
+
+(defrecord SimpleVertex
+  [position color normal])
+
 
 (defrecord Vertex
   [position normal texture color output]

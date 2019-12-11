@@ -95,7 +95,8 @@
         h (.getHeight c) h2 (/ h 2)
         canvas (BufferedImage. w h BufferedImage/TYPE_INT_ARGB)]
     (clear canvas)
-    (draw-cube-another canvas @camera/camera-position)      ;(terrain/render-to canvas w))
+    (draw-cube-another canvas @camera/camera-position)
+    ;(camera/rasterize canvas [vAf vBf vCf vDf vAb vBb vCb vDb] camera/move-camera-right);(terrain/render-to canvas w))
     (.drawImage g canvas nil nil)))
 
 
@@ -114,19 +115,19 @@
                     (cond
                       (= key KeyEvent/VK_W)
                       (do
-                        (swap! camera/target camera/move-camera-forward)
+                        ;(swap! camera/target camera/move-camera-forward)
                         (swap! camera/camera-position camera/move-camera-forward))
                       (= key KeyEvent/VK_A)
                       (do
-                        (swap! camera/target camera/move-camera-left)
+                        ;(swap! camera/target camera/move-camera-left)
                         (swap! camera/camera-position camera/move-camera-left))
                       (= key KeyEvent/VK_S)
                       (do
-                        (swap! camera/target camera/move-camera-backward)
+                        ;(swap! camera/target camera/move-camera-backward)
                         (swap! camera/camera-position camera/move-camera-backward))
                       (= key KeyEvent/VK_D)
                       (do
-                        (swap! camera/target camera/move-camera-right)
+                        ;(swap! camera/target camera/move-camera-right)
                         (swap! camera/camera-position camera/move-camera-right))))
                   (.repaint canvas))))))
 
