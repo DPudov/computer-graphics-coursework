@@ -32,10 +32,5 @@
         light (:light state)]))
 
 
-
-
-(definterface Drawable
-  (draw [camera meshes]))
-
-(deftype Engine
-  [graphics width height depth-buffer image-buffer])
+(def near-plane-z -1.7)
+(def alpha (atom 1))

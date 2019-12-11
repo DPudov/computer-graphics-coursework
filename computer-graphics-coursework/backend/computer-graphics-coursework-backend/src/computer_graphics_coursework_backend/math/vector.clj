@@ -266,7 +266,7 @@
              (+ (.getZ v1) (.getZ v2))
              (+ (.getW v1) (.getW v2))))
 
-(defn- sub-4d [^Vector4D v1 ^Vector4D v2]
+(defn sub-4d [^Vector4D v1 ^Vector4D v2]
   (Vector4D. (- (.getX v1) (.getX v2))
              (- (.getY v1) (.getY v2))
              (- (.getZ v1) (.getZ v2))

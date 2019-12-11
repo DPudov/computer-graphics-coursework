@@ -4,7 +4,6 @@
         seesaw.color)
   (:require [computer_graphics_coursework_backend.math.vector :as vec]
             [computer_graphics_coursework_backend.math.matrix :as matr]
-            [computer-graphics-coursework-backend.render.engine :as engine]
             [computer_graphics_coursework_backend.render.camera :as camera]
             [computer_graphics_coursework_backend.render.drawer :as drawer]
             [computer-graphics-coursework-backend.world.terrain :as terrain]
@@ -14,7 +13,8 @@
            (javax.swing Timer)
            (java.awt.event ActionListener KeyEvent)
            (computer_graphics_coursework_backend.math.vector Vector3D Vector4D)
-           (computer_graphics_coursework_backend.math.matrix Matrix4D)))
+           (computer_graphics_coursework_backend.math.matrix Matrix4D)
+           (computer_graphics_coursework_backend.render.camera Camera)))
 
 (def desired-fps 30)
 
@@ -48,9 +48,10 @@
 (def vDb (Vector4D. -1 -1 3 1))
 
 (defn draw-cube-another
-  [canvas camera-position]
-  (let [mvp (camera/model-view-projection-matrix camera/perspective
-                                                 (camera/view-matrix camera-position @camera/target camera/up)
+  [canvas camera]
+  (let [mvp (camera/model-view-projection-matrix (camera/perspective (:position camera))
+                                                 ;(camera/compute-third-person-camera (:position camera) @camera/target camera/up)
+                                                 (camera/get-view-matrix camera)
                                                  model-matrix)
         viewport [(.getWidth canvas) (.getHeight canvas)]
         vafp (camera/project-to-screen vAf mvp viewport)
@@ -61,6 +62,7 @@
         vbbp (camera/project-to-screen vBb mvp viewport)
         vcbp (camera/project-to-screen vCb mvp viewport)
         vdbp (camera/project-to-screen vDb mvp viewport)]
+
     (drawer/draw-line-fast canvas (vafp 0) (vafp 1) (vbfp 0) (vbfp 1) Color/BLUE)
     (drawer/draw-line-fast canvas (vbfp 0) (vbfp 1) (vcfp 0) (vcfp 1) Color/BLUE)
     (drawer/draw-line-fast canvas (vcfp 0) (vcfp 1) (vdfp 0) (vdfp 1) Color/BLUE)
@@ -79,7 +81,7 @@
   (let [delta-angle (Vector3D. 0 0.5 0)]
     (Timer. tick-time (reify ActionListener
                         (actionPerformed [this e]
-                          (swap! camera/camera-position camera/rotate-camera delta-angle)
+                          ;(swap! camera/camera-position camera/rotate-camera delta-angle)
                           (.repaint canvas))))))
 
 (defn clear [canvas]
@@ -95,7 +97,7 @@
         h (.getHeight c) h2 (/ h 2)
         canvas (BufferedImage. w h BufferedImage/TYPE_INT_ARGB)]
     (clear canvas)
-    (draw-cube-another canvas @camera/camera-position)
+    (draw-cube-another canvas @camera/cam)
     ;(camera/rasterize canvas [vAf vBf vCf vDf vAb vBb vCb vDb] camera/move-camera-right);(terrain/render-to canvas w))
     (.drawImage g canvas nil nil)))
 
@@ -104,6 +106,7 @@
 (defn generate-world [root]
   (let [canvas (select root [:#canvas])
         timer (create-timer (time-ms-by-fps desired-fps) canvas)]
+
     ;(.start timer)
     (-> canvas
         ;(.setFocusable true)
@@ -114,20 +117,20 @@
                   (let [key (.getKeyCode e)]
                     (cond
                       (= key KeyEvent/VK_W)
-                      (do
-                        ;(swap! camera/target camera/move-camera-forward)
-                        (swap! camera/camera-position camera/move-camera-forward))
+                      (swap! camera/cam camera/move-forward 1 1)
                       (= key KeyEvent/VK_A)
-                      (do
-                        ;(swap! camera/target camera/move-camera-left)
-                        (swap! camera/camera-position camera/move-camera-left))
+                      (swap! camera/cam camera/move-left 1 1)
                       (= key KeyEvent/VK_S)
-                      (do
-                        ;(swap! camera/target camera/move-camera-backward)
-                        (swap! camera/camera-position camera/move-camera-backward))
+                      (swap! camera/cam camera/move-backward 1 1)
                       (= key KeyEvent/VK_D)
-                      (do
-                        ;(swap! camera/target camera/move-camera-right)
-                        (swap! camera/camera-position camera/move-camera-right))))
+                      (swap! camera/cam camera/move-right 1 1)
+                      (or (= key KeyEvent/VK_KP_UP) (= key KeyEvent/VK_UP))
+                      (swap! camera/cam camera/turn-up 1 1)
+                      (or (= key KeyEvent/VK_KP_DOWN) (= key KeyEvent/VK_DOWN))
+                      (swap! camera/cam camera/turn-down 1 1)
+                      (or (= key KeyEvent/VK_KP_RIGHT) (= key KeyEvent/VK_RIGHT))
+                      (swap! camera/cam camera/turn-right 1 1)
+                      (or (= key KeyEvent/VK_KP_LEFT) (= key KeyEvent/VK_LEFT))
+                      (swap! camera/cam camera/turn-left 1 1)))
                   (.repaint canvas))))))
 
