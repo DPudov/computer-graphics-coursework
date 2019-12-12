@@ -1,8 +1,11 @@
 (ns computer_graphics_coursework_backend.render.drawer
-  (:require [computer_graphics_coursework_backend.math.vector :as vec])
+  (:require [computer_graphics_coursework_backend.math.vector :as vec]
+            [computer_graphics_coursework_backend.render.voxel :as voxel]
+            [computer_graphics_coursework_backend.render.camera :as camera])
   (:import java.awt.image.BufferedImage
            (computer_graphics_coursework_backend.math.vector Vector3D Vector2D)
-           (java.awt Color)))
+           (java.awt Color)
+           (computer_graphics_coursework_backend.math.matrix Matrix4D)))
 (def width 640)
 
 (def height 480)
@@ -22,11 +25,11 @@
   (let [g (.getGraphics image-buffer)]
     (.setColor g color)
     (.drawLine g xb yb xe ye)))
-    ;(-> g
-    ;    (.setBackground Color/CYAN)
-    ;    (println image-buffer xb yb xe ye color))))
-        ;(.setStroke color)
-        ;(.drawLine xb yb xe ye))))
+;(-> g
+;    (.setBackground Color/CYAN)
+;    (println image-buffer xb yb xe ye color))))
+;(.setStroke color)
+;(.drawLine xb yb xe ye))))
 
 (defn draw-line
   [^BufferedImage image-buffer xb yb xe ye ^Color color]
@@ -54,7 +57,41 @@
                   (recur (inc xi) yi (- error delta-y)))))))))))
 
 (defn draw-voxel
-  [^BufferedImage image-buffer])
+  [^BufferedImage canvas vertices color]
+  (let [vafp (vertices 0)
+        vbfp (vertices 1)
+        vcfp (vertices 2)
+        vdfp (vertices 3)
+        vabp (vertices 4)
+        vbbp (vertices 5)
+        vcbp (vertices 6)
+        vdbp (vertices 7)]
+    (draw-line-fast canvas (vafp 0) (vafp 1) (vbfp 0) (vbfp 1) color)
+    (draw-line-fast canvas (vbfp 0) (vbfp 1) (vcfp 0) (vcfp 1) color)
+    (draw-line-fast canvas (vcfp 0) (vcfp 1) (vdfp 0) (vdfp 1) color)
+    (draw-line-fast canvas (vdfp 0) (vdfp 1) (vafp 0) (vafp 1) color)
+    (draw-line-fast canvas (vabp 0) (vabp 1) (vbbp 0) (vbbp 1) color)
+    (draw-line-fast canvas (vbbp 0) (vbbp 1) (vcbp 0) (vcbp 1) color)
+    (draw-line-fast canvas (vcbp 0) (vcbp 1) (vdbp 0) (vdbp 1) color)
+    (draw-line-fast canvas (vdbp 0) (vdbp 1) (vabp 0) (vabp 1) color)
+    (draw-line-fast canvas (vafp 0) (vafp 1) (vabp 0) (vabp 1) color)
+    (draw-line-fast canvas (vbfp 0) (vbfp 1) (vbbp 0) (vbbp 1) color)
+    (draw-line-fast canvas (vcfp 0) (vcfp 1) (vcbp 0) (vcbp 1) color)
+    (draw-line-fast canvas (vdfp 0) (vdfp 1) (vdbp 0) (vdbp 1) color)))
+
+
+(def model-matrix
+  (Matrix4D. 1.0 0.0 0.0 0.0
+             0.0 1.0 0.0 0.0
+             0.0 0.0 1.0 0.0
+             0.0 0.0 0.0 1.0))
+
+(defn draw-voxels
+  [^BufferedImage canvas voxels camera]
+  (let [mesh (voxel/generate-voxel-mesh voxels)
+        mvp (camera/model-view-projection-matrix (camera/perspective (:position camera))
+                                                 (camera/get-view-matrix camera)
+                                                 model-matrix)]))
 
 
 

@@ -1,6 +1,9 @@
 (ns computer-graphics-coursework-backend.world.terrain
-  (:require [computer-graphics-coursework-backend.world.perlin :as perlin])
-  (:import (java.awt Color)))
+  (:require [computer-graphics-coursework-backend.world.perlin :as perlin]
+            [computer_graphics_coursework_backend.render.voxel :as voxel]
+            [computer_graphics_coursework_backend.render.camera :as camera])
+  (:import (java.awt Color)
+           (computer_graphics_coursework_backend.render.voxel Voxel)))
 
 
 (defn hsb-to-rgb
@@ -66,16 +69,16 @@
                 (int (* 100 dim))))))
     terrain))
 
-(defn render-to
-  [canvas width]
-  (let [dim 500
-        voxel-width (/ width dim)
-        w2 (/ width 2)
-        terrain (init-terrain 500)]
+(def init-terrain-memo
+  (memoize init-terrain))
+
+(defn get-terrain-voxels
+  [dim]
+  (let [terrain-map (init-terrain-memo dim)
+        voxels []]
     (dotimes [i dim]
       (dotimes [j dim]
-        (println terrain)
-        (dotimes [k (aget terrain i j)]
+        (dotimes [k (aget terrain-map i j)]
           (let [hue (int (* 50 (perlin/noise (/ (* hue-noise i) dim)
                                              (/ (* hue-noise j) dim)
                                              (/ (* hue-noise k) dim))))
@@ -83,7 +86,30 @@
                                                            (/ (* saturation-noise j) dim)
                                                            (/ (* saturation-noise k) dim)))))
                 brightness 150
-                stroke-color (hsb-to-rgb hue saturation brightness)]
-            (push-matrix)
+                stroke-color (Color. (hsb-to-rgb hue saturation brightness))]
+            (conj voxels (Voxel. i k j stroke-color))))))))
 
-            (pop-matrix)))))))
+(def get-terrain-voxels-memo
+  (memoize get-terrain-voxels))
+
+;(defn render-to
+;  [canvas width mvp viewport]
+;  (let [dim 10
+;        voxel-width (/ width dim)
+;        w2 (/ width 2)
+;        terrain (init-terrain 10)]
+;    (dotimes [i dim]
+;      (dotimes [j dim]
+;        (dotimes [k (aget terrain i j)]
+;          (let [hue (int (* 50 (perlin/noise (/ (* hue-noise i) dim)
+;                                             (/ (* hue-noise j) dim)
+;                                             (/ (* hue-noise k) dim))))
+;                saturation (int (+ 50 (* 100 (perlin/noise (+ 1000 (/ (* saturation-noise i) dim))
+;                                                           (/ (* saturation-noise j) dim)
+;                                                           (/ (* saturation-noise k) dim)))))
+;                brightness 150
+;                stroke-color (hsb-to-rgb hue saturation brightness)
+;                vertices (voxel/get-vertices i j k voxel-width)]
+;            (computer_graphics_coursework_backend.render.drawer/draw-voxel canvas
+;                                                                           (vec (for [v vertices] (camera/project-to-screen v mvp viewport)))
+;                                                                           (Color. stroke-color))))))))

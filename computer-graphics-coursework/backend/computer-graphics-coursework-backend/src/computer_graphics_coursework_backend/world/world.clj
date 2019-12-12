@@ -7,6 +7,7 @@
             [computer_graphics_coursework_backend.render.camera :as camera]
             [computer_graphics_coursework_backend.render.drawer :as drawer]
             [computer-graphics-coursework-backend.world.terrain :as terrain]
+            [computer-graphics-coursework-backend.world.water :as water]
             [computer-graphics-coursework-backend.world.perlin :as perlin])
   (:import (java.awt.image BufferedImage)
            (java.awt Color)
@@ -47,38 +48,18 @@
 (def vCb (Vector4D. 1 -1 3 1))
 (def vDb (Vector4D. -1 -1 3 1))
 
-(defn draw-cube-another
-  [canvas camera]
-  (let [mvp (camera/model-view-projection-matrix (camera/perspective (:position camera))
-                                                 ;(camera/compute-third-person-camera (:position camera) @camera/target camera/up)
-                                                 (camera/get-view-matrix camera)
-                                                 model-matrix)
-        viewport [(.getWidth canvas) (.getHeight canvas)]
-        vafp (camera/project-to-screen vAf mvp viewport)
-        vbfp (camera/project-to-screen vBf mvp viewport)
-        vcfp (camera/project-to-screen vCf mvp viewport)
-        vdfp (camera/project-to-screen vDf mvp viewport)
-        vabp (camera/project-to-screen vAb mvp viewport)
-        vbbp (camera/project-to-screen vBb mvp viewport)
-        vcbp (camera/project-to-screen vCb mvp viewport)
-        vdbp (camera/project-to-screen vDb mvp viewport)]
-
-    (drawer/draw-line-fast canvas (vafp 0) (vafp 1) (vbfp 0) (vbfp 1) Color/BLUE)
-    (drawer/draw-line-fast canvas (vbfp 0) (vbfp 1) (vcfp 0) (vcfp 1) Color/BLUE)
-    (drawer/draw-line-fast canvas (vcfp 0) (vcfp 1) (vdfp 0) (vdfp 1) Color/BLUE)
-    (drawer/draw-line-fast canvas (vdfp 0) (vdfp 1) (vafp 0) (vafp 1) Color/BLUE)
-    (drawer/draw-line-fast canvas (vabp 0) (vabp 1) (vbbp 0) (vbbp 1) Color/RED)
-    (drawer/draw-line-fast canvas (vbbp 0) (vbbp 1) (vcbp 0) (vcbp 1) Color/RED)
-    (drawer/draw-line-fast canvas (vcbp 0) (vcbp 1) (vdbp 0) (vdbp 1) Color/RED)
-    (drawer/draw-line-fast canvas (vdbp 0) (vdbp 1) (vabp 0) (vabp 1) Color/RED)
-    (drawer/draw-line-fast canvas (vafp 0) (vafp 1) (vabp 0) (vabp 1) Color/GREEN)
-    (drawer/draw-line-fast canvas (vbfp 0) (vbfp 1) (vbbp 0) (vbbp 1) Color/GREEN)
-    (drawer/draw-line-fast canvas (vcfp 0) (vcfp 1) (vcbp 0) (vcbp 1) Color/GREEN)
-    (drawer/draw-line-fast canvas (vdfp 0) (vdfp 1) (vdbp 0) (vdbp 1) Color/GREEN)))
+;(defn draw-cube-another
+;  [canvas camera]
+;  (let [mvp (camera/model-view-projection-matrix (camera/perspective (:position camera))
+;                                                 ;(camera/compute-third-person-camera (:position camera) @camera/target camera/up)
+;                                                 (camera/get-view-matrix camera)
+;                                                 model-matrix)
+;        viewport [(.getWidth canvas) (.getHeight canvas)]]
+;    (terrain/render-to canvas (.getWidth canvas) mvp viewport)))
 
 (defn create-timer
   [tick-time canvas]
-  (let [delta-angle (Vector3D. 0 0.5 0)]
+  (let []
     (Timer. tick-time (reify ActionListener
                         (actionPerformed [this e]
                           ;(swap! camera/camera-position camera/rotate-camera delta-angle)
@@ -95,9 +76,13 @@
 (defn paint-frame [c g]
   (let [w (.getWidth c) w2 (/ w 2)
         h (.getHeight c) h2 (/ h 2)
-        canvas (BufferedImage. w h BufferedImage/TYPE_INT_ARGB)]
+        canvas (BufferedImage. w h BufferedImage/TYPE_INT_ARGB)
+        terrain (terrain/get-terrain-voxels 50)
+        water (water/get-water-voxels)
+        voxels (vec (concat terrain water))]
     (clear canvas)
-    (draw-cube-another canvas @camera/cam)
+    (drawer/draw-voxels canvas voxels @camera/cam)
+    ;(draw-cube-another canvas @camera/cam)
     ;(camera/rasterize canvas [vAf vBf vCf vDf vAb vBb vCb vDb] camera/move-camera-right);(terrain/render-to canvas w))
     (.drawImage g canvas nil nil)))
 

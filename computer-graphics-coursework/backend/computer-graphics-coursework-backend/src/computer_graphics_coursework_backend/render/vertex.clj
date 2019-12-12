@@ -7,10 +7,6 @@
 (defprotocol Outsider
   (is-outside []))
 
-(defrecord SimpleVertex
-  [position color normal])
-
-
 (defrecord Vertex
   [position normal texture color output]
   Outsider
