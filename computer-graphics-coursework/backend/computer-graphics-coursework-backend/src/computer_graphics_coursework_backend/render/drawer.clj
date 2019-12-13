@@ -94,13 +94,7 @@
              0.0 1.0 0.0 0.0
              0.0 0.0 1.0 0.0
              0.0 0.0 0.0 1.0))
-(defn draw-clipped-triangle
-  [triangle]
-  (let [v1 (:v1 triangle)
-        v2 (:v2 triangle)
-        v3 (:v3 triangle)
-        x1 ((:position))
-        back-face-culling ((:x v1))]))
+
 
 
 (defn point-in-front
@@ -139,25 +133,66 @@
             (reset! start el))))
       @output)))
 
+(defn barycentric
+  [p1 p2 p3 p]
+  (let [v0 (vec/sub-3d p2 p1)
+        v1 (vec/sub-3d p3 p1)
+        v2 (vec/sub-3d p p1)
+        d00 (vec/dot-3d v0 v0)
+        d01 (vec/dot-3d v0 v1)
+        d11 (vec/dot-3d v1 v1)
+        d20 (vec/dot-3d v2 v0)
+        d21 (vec/dot-3d v2 v1)
+        d (- (* d00 d11) (* d01 d01))
+        v (/ (- (* d11 d20) (* d01 d21)) d)
+        w (/ (- (* d00 d21) (* d01 d20)) d)
+        u (- 1 v w)]
+    (Vector4D. u v w 1)))
+
 (defn clip-triangle [v1 v2 v3]
   (let [w1 (:output v1)
         w2 (:output v2)
         w3 (:output v3)
         points [w1 w2 w3]
-        new-points (sutherland-hodgman points clip-planes)]))
+        new-points (sutherland-hodgman points clip-planes)
+        result (atom [])]
+    (doseq [i (range 2 (count new-points))]
+      (let [b1 (barycentric w1 w2 w3 (first new-points))
+            b2 (barycentric w1 w2 w3 (new-points (dec i)))
+            b3 (barycentric w1 w2 w3 (new-points i))
+            v1 (vertex/interpolate-vertices v1 v2 v3 b1)
+            v2 (vertex/interpolate-vertices v1 v2 v3 b2)
+            v3 (vertex/interpolate-vertices v1 v2 v3 b3)]
+        (swap! result conj (Triangle. v1 v2 v3))))))
 
-(defn draw-triangle
-  [triangle]
+(defn draw-clipped-triangle
+  [canvas triangle]
   (let [v1 (:v1 triangle)
         v2 (:v2 triangle)
-        v3 (:v3 triangle)]
-    (if (or (vertex/is-outside v1) (vertex/is-outside v2) (vertex/is-outside v3))
-      (let [triangles (clip-triangle v1 v2 v3)]
-        (pmap draw-clipped-triangle triangles))
-      (draw-clipped-triangle triangle))))
+        v3 (:v3 triangle)
+        x1 ((:position))
+        back-face-culling ((:x v1))]))
+
 (defn draw-triangles
-  [triangles]
-  (pmap draw-triangle triangles))
+  [triangles canvas]
+  (pmap (fn draw-triangle [triangle]
+          (let [v1 (:v1 triangle)
+                v2 (:v2 triangle)
+                v3 (:v3 triangle)]
+            (if (or (vertex/is-outside v1) (vertex/is-outside v2) (vertex/is-outside v3))
+              (let [triangles (clip-triangle v1 v2 v3)]
+                (pmap (fn draw-clipped-triangle
+                        [triangle]
+                        (let [v1 (:v1 triangle)
+                              v2 (:v2 triangle)
+                              v3 (:v3 triangle)
+                              x1 ((:position))
+                              back-face-culling ((:x v1))])) triangles))
+              (draw-clipped-triangle canvas triangle)))) triangles))
+
+(defn draw-mesh [canvas mesh]
+  (let [triangles (:triangles mesh)]
+    (draw-triangles canvas triangles)))
 
 (defn draw-voxels
   [^BufferedImage canvas voxels camera]
@@ -165,7 +200,7 @@
         mvp (camera/model-view-projection-matrix (camera/perspective (:position camera))
                                                  (camera/get-view-matrix camera)
                                                  model-matrix)]
-    (draw-mesh canvas)))
+    (draw-mesh canvas mesh)))
 
 
 
