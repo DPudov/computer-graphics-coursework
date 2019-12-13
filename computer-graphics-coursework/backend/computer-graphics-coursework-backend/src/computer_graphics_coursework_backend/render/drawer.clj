@@ -89,7 +89,7 @@
   (let [v1 (:v1 triangle)
         v2 (:v2 triangle)
         v3 (:v3 triangle)
-        x1 ((:position ))
+        x1 ((:position))
         back-face-culling ((:x v1))]))
 
 (defn draw-triangle
@@ -110,7 +110,8 @@
   (let [mesh (voxel/generate-voxel-mesh voxels)
         mvp (camera/model-view-projection-matrix (camera/perspective (:position camera))
                                                  (camera/get-view-matrix camera)
-                                                 model-matrix)]))
+                                                 model-matrix)]
+    (draw-mesh canvas )))
 
 
 

@@ -44,19 +44,17 @@
     (.setBackground g Color/WHITE)
     (.clearRect g 0 0 w h)))
 
-
-(defn paint-frame [c g]
-  (let [w (.getWidth c) w2 (/ w 2)
-        h (.getHeight c) h2 (/ h 2)
-        canvas (BufferedImage. w h BufferedImage/TYPE_INT_ARGB)
+(defn paint-frame [canvas graphics]
+  (let [w (.getWidth canvas)
+        h (.getHeight canvas)
+        frame (BufferedImage. w h BufferedImage/TYPE_INT_ARGB)
         terrain-map (terrain/init-terrain-memo dim)
         water-map @water/water-map
         terrain (terrain/get-terrain-voxels-memo dim)
         water (water/get-water-voxels dim terrain-map water-map Color/BLUE)
         voxels (vec (concat terrain water))]
-    (clear canvas)
-    (drawer/draw-voxels canvas voxels @camera/cam)
-    (.drawImage g canvas nil nil)))
+    (drawer/draw-voxels frame voxels @camera/cam)
+    (.drawImage graphics frame nil nil)))
 
 (defn generate-world [root]
   (let [canvas (select root [:#canvas])
