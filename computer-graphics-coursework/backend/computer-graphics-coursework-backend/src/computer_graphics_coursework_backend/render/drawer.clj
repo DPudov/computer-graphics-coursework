@@ -4,7 +4,7 @@
             [computer_graphics_coursework_backend.render.camera :as camera]
             [computer_graphics_coursework_backend.render.vertex :as vertex])
   (:import java.awt.image.BufferedImage
-           (computer_graphics_coursework_backend.math.vector Vector3D Vector2D)
+           (computer_graphics_coursework_backend.math.vector Vector3D Vector2D Vector4D)
            (java.awt Color)
            (computer_graphics_coursework_backend.math.matrix Matrix4D)
            (computer_graphics_coursework_backend.render.triangle Triangle)))
@@ -13,6 +13,16 @@
 (def height 480)
 
 
+(defrecord ClipPlane
+  [p n])
+
+(def clip-planes
+  [(ClipPlane. (Vector4D. 1 0 0 1) (Vector4D. -1 0 0 1))
+   (ClipPlane. (Vector4D. -1 0 0 1) (Vector4D. 1 0 0 1))
+   (ClipPlane. (Vector4D. 0 1 0 1) (Vector4D. 0 -1 0 1))
+   (ClipPlane. (Vector4D. 0 -1 0 1) (Vector4D. 0 1 0 1))
+   (ClipPlane. (Vector4D. 0 0 1 1) (Vector4D. 0 0 -1 1))
+   (ClipPlane. (Vector4D. 0 0 -1 1) (Vector4D. 0 0 1 1))])
 
 (defn put-pixel [^BufferedImage image-buffer x y ^Color color]
   (.setRGB image-buffer x y (.getRGB color)))
@@ -92,11 +102,55 @@
         x1 ((:position))
         back-face-culling ((:x v1))]))
 
+
+(defn point-in-front
+  [plane point]
+  (pos? (vec/dot (vec/sub point (:p plane)) (:n plane))))
+
+(defn intersect-segment
+  [plane v0 v1]
+  (let [u (vec/sub v1 v0)
+        w (vec/sub v0 (:p plane))
+        d (vec/dot (:n plane) u)
+        n (vec/dot (vec/sub (:n plane)) w)]
+    (vec/add v0 (vec/scale u (/ n d)))))
+
+(defn sutherland-hodgman
+  "Sutherland-Hodgman clipping algorithm"
+  [points clip-planes]
+  (let [output (atom points)
+        input (atom nil)]
+    (doseq [plane clip-planes]
+      (reset! input @output)
+      (reset! output nil)
+      (if (not (zero? (count @input)))
+        (let [start (atom (last @input))]
+          (doseq [el @input]
+            (cond
+              (point-in-front plane el)
+              (do
+                (if (not (point-in-front plane @start))
+                  (let [x (intersect-segment plane @start el)]
+                    (swap! output conj x)))
+                (swap! output conj el))
+              (point-in-front plane @start)
+              (let [x (intersect-segment plane @start el)]
+                (swap! output conj x)))
+            (reset! start el))))
+      @output)))
+
+(defn clip-triangle [v1 v2 v3]
+  (let [w1 (:output v1)
+        w2 (:output v2)
+        w3 (:output v3)
+        points [w1 w2 w3]
+        new-points (sutherland-hodgman points clip-planes)]))
+
 (defn draw-triangle
   [triangle]
-  (let [v1 (shader (:v1 triangle))
-        v2 (shader (:v2 triangle))
-        v3 (shader (:v3 triangle))]
+  (let [v1 (:v1 triangle)
+        v2 (:v2 triangle)
+        v3 (:v3 triangle)]
     (if (or (vertex/is-outside v1) (vertex/is-outside v2) (vertex/is-outside v3))
       (let [triangles (clip-triangle v1 v2 v3)]
         (pmap draw-clipped-triangle triangles))
@@ -111,7 +165,7 @@
         mvp (camera/model-view-projection-matrix (camera/perspective (:position camera))
                                                  (camera/get-view-matrix camera)
                                                  model-matrix)]
-    (draw-mesh canvas )))
+    (draw-mesh canvas)))
 
 
 
