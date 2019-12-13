@@ -1,7 +1,6 @@
 (ns computer_graphics_coursework_backend.render.camera
   (:require [computer_graphics_coursework_backend.math.matrix :as matr]
-            [computer_graphics_coursework_backend.math.vector :as vec]
-            [computer_graphics_coursework_backend.render.drawer :as drawer])
+            [computer_graphics_coursework_backend.math.vector :as vec])
 
   (:import (computer_graphics_coursework_backend.math.vector Vector4D Vector3D)
            (java.awt.image BufferedImage)

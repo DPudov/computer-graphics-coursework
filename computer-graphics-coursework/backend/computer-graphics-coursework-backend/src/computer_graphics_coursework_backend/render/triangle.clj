@@ -1,8 +1,5 @@
-(ns computer_graphics_coursework_backend.render.triangle
-  (:require [computer_graphics_coursework_backend.math.vector :as vec]))
-
-(defrecord Triangle
-  [v1 v2 v3])
+(ns computer_graphics_coursework_backend.render.triangle)
+(defrecord Triangle [v1 v2 v3])
 
 (defn is-degenerate [triangle]
   (let [p1 (:position (:v1 triangle))

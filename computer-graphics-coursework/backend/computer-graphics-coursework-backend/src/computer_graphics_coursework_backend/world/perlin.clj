@@ -1,4 +1,4 @@
-(ns computer-graphics-coursework-backend.world.perlin)
+(ns computer_graphics_coursework_backend.world.perlin)
 
 
 (def perlin-mask 255)

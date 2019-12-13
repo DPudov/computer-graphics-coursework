@@ -2,20 +2,14 @@
   (:use seesaw.core
         seesaw.graphics
         seesaw.color)
-  (:require [computer_graphics_coursework_backend.math.vector :as vec]
-            [computer_graphics_coursework_backend.math.matrix :as matr]
-            [computer_graphics_coursework_backend.render.camera :as camera]
+  (:require [computer_graphics_coursework_backend.render.camera :as camera]
             [computer_graphics_coursework_backend.render.drawer :as drawer]
-            [computer-graphics-coursework-backend.world.terrain :as terrain]
-            [computer-graphics-coursework-backend.world.water :as water]
-            [computer-graphics-coursework-backend.world.perlin :as perlin])
+            [computer_graphics_coursework_backend.world.terrain :as terrain]
+            [computer_graphics_coursework_backend.world.water :as water])
   (:import (java.awt.image BufferedImage)
            (java.awt Color)
            (javax.swing Timer)
-           (java.awt.event ActionListener KeyEvent)
-           (computer_graphics_coursework_backend.math.vector Vector3D Vector4D)
-           (computer_graphics_coursework_backend.math.matrix Matrix4D)
-           (computer_graphics_coursework_backend.render.camera Camera)))
+           (java.awt.event ActionListener KeyEvent)))
 
 (def desired-fps 30)
 
@@ -24,8 +18,7 @@
   (/ 1000 fps))
 
 (def dim 50)
-(defn update-arr [arr new-arr]
-  new-arr)
+
 (defn create-timer
   [tick-time canvas]
   (let []
@@ -33,8 +26,8 @@
                         (actionPerformed [this e]
                           (let [[new-water new-energy]
                                 (water/update-water (terrain/init-terrain-memo dim) @water/water-map @water/energy-map dim)]
-                            (swap! water/water-map update-arr new-water)
-                            (swap! water/energy-map update-arr new-energy))
+                            (reset! water/water-map new-water)
+                            (reset! water/energy-map new-energy))
                           (.repaint canvas))))))
 
 (defn clear [canvas]
@@ -53,6 +46,8 @@
         terrain (terrain/get-terrain-voxels-memo dim)
         water (water/get-water-voxels dim terrain-map water-map Color/BLUE)
         voxels (vec (concat terrain water))]
+    (println "Terrain count" (count terrain))
+    (println "Water count" (count water))
     (drawer/draw-voxels frame voxels @camera/cam)
     (.drawImage graphics frame nil nil)))
 

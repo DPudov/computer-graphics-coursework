@@ -1,26 +1,11 @@
-(ns computer-graphics-coursework-backend.world.terrain
-  (:require [computer-graphics-coursework-backend.world.perlin :as perlin]
-            [computer_graphics_coursework_backend.render.voxel :as voxel]
-            [computer_graphics_coursework_backend.render.camera :as camera])
+(ns computer_graphics_coursework_backend.world.terrain
+  (:require [computer_graphics_coursework_backend.world.perlin :as perlin])
   (:import (java.awt Color)
            (computer_graphics_coursework_backend.render.voxel Voxel)))
-
 
 (defn hsb-to-rgb
   [hue saturation brightness]
   (Color/HSBtoRGB hue saturation brightness))
-
-(def matrix-stack
-  '())
-
-(def matrix-context)
-
-(defn push-matrix []
-  (conj matrix-stack matrix-context))
-
-(defn pop-matrix []
-  (var-set matrix-context (peek matrix-stack))
-  (var-set matrix-stack (pop matrix-stack)))
 
 (def terrain-noise 5)
 
@@ -28,18 +13,12 @@
 
 (def saturation-noise 3)
 
-(defn wall-level
-  [dim]
-  (* dim 100))
-
-
 (defn parabolic-height
   [dim i j]
   (- (* 0.4 dim) (* 0.02 (+ (* (- i (/ dim 2))
                                (- i (/ dim 2)))
                             (* (- j (/ dim 2))
                                (- j (/ dim 2)))))))
-
 
 (defn noised-height
   [dim i j terrain-noise]
@@ -52,16 +31,13 @@
   (max 0
        (int (+ parabolic noised))))
 
-
-
-
 (defn init-terrain
   [dim]
   (let
     [terrain (make-array Integer/TYPE dim dim)]
     (dotimes [i dim]
       (dotimes [j dim]
-        (if (not (or (= i 0) (= i (- dim 1) (= j 0) (= j (- dim 1)))))
+        (if (not (or (= i 0) (= i (dec dim)) (= j 0) (= j (dec dim))))
           (aset terrain i j
                 (int (calculate-height (parabolic-height dim i j)
                                        (noised-height dim i j terrain-noise))))
@@ -72,13 +48,17 @@
 (def init-terrain-memo
   (memoize init-terrain))
 
-
 (defn get-terrain-voxels
   [dim]
   (let [terrain-map (init-terrain-memo dim)
-        voxels []]
-    (dotimes [i dim]
-      (dotimes [j dim]
+        voxels (atom [])]
+    ; print mountains to terminal
+    ;(dotimes [i dim]
+    ;  (dotimes [j dim]
+    ;    (if (= j (dec dim)) (println (aget terrain-map i j))
+    ;                    (print (aget terrain-map i j) " "))))
+    (doseq [i (range 1 (dec dim))]
+      (doseq [j (range 1 (dec dim))]
         (dotimes [k (aget terrain-map i j)]
           (let [hue (int (* 50 (perlin/noise (/ (* hue-noise i) dim)
                                              (/ (* hue-noise j) dim)
@@ -88,7 +68,8 @@
                                                            (/ (* saturation-noise k) dim)))))
                 brightness 150
                 stroke-color (Color. (hsb-to-rgb hue saturation brightness))]
-            (conj voxels (Voxel. i k j stroke-color))))))))
+            (swap! voxels conj (Voxel. i k j stroke-color))))))
+    @voxels))
 
 (def get-terrain-voxels-memo
   (memoize get-terrain-voxels))

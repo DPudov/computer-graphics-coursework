@@ -1,6 +1,6 @@
 (ns computer_graphics_coursework_backend.render.vertex
   (:require [computer_graphics_coursework_backend.math.vector :as vec]
-            [computer-graphics-coursework-backend.render.color :as c])
+            [computer_graphics_coursework_backend.render.color :as color])
   (:import (computer_graphics_coursework_backend.math.vector Vector4D Vector3D)
            (java.awt Color)))
 
@@ -20,20 +20,18 @@
            (* v2 (b 1))
            (* v3 (b 2))))
 
-   (* n (b 3))))
+    (* n (b 3))))
 
 (defn interpolate-colors
   [v1 v2 v3 b]
-  (let [n (Color.)]
-    (-> n
-        (c/sum-colors (c/scale-color v1 (b 0)))
-        (c/sum-colors (c/scale-color v2 (b 1)))
-        (c/sum-colors (c/scale-color v3 (b 2))))))
-
+  (let [n (Color. 0 0 0 0)]
+    (reduce color/sum-colors [n (color/scale-color v1 (b 0))
+                                (color/scale-color v2 (b 1))
+                                (color/scale-color v3 (b 2))])))
 
 (defn interpolate-vecs-3d
   [v1 v2 v3 b]
-  (let [n (Vector3D.)]
+  (let [n (Vector3D. 0 0 0)]
     (-> n
         (vec/add (vec/scale-3d v1 (b 0))
                  (vec/scale-3d v2 (b 1))
@@ -42,7 +40,7 @@
 
 (defn interpolate-vecs-4d
   [v1 v2 v3 b]
-  (let [n (Vector4D.)]
+  (let [n (Vector4D. 0 0 0 0)]
     (-> n
         (vec/add (vec/scale-4d v1 (b 0))
                  (vec/scale-4d v2 (b 1))

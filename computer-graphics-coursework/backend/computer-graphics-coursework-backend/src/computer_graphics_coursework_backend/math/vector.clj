@@ -229,7 +229,7 @@
              (+ (.getY v1) (.getY v2))
              (+ (.getZ v1) (.getZ v2))))
 
-(defn- sub-3d [^Vector3D v1 ^Vector3D v2]
+(defn sub-3d [^Vector3D v1 ^Vector3D v2]
   (Vector3D. (- (.getX v1) (.getX v2))
              (- (.getY v1) (.getY v2))
              (- (.getZ v1) (.getZ v2))))
@@ -244,12 +244,12 @@
              (/ (.getY v1) (.getY v2))
              (/ (.getZ v1) (.getZ v2))))
 
-(defn- scale-3d [^Vector3D v ^double f]
+(defn scale-3d [^Vector3D v ^double f]
   (Vector3D. (* (.getX v) f)
              (* (.getY v) f)
              (* (.getZ v) f)))
 
-(defn- dot-3d [v1 v2]
+(defn dot-3d [v1 v2]
   (+ (* (.getX v1) (.getX v2))
      (* (.getY v1) (.getY v2))
      (* (.getZ v1) (.getZ v2))))
@@ -284,7 +284,7 @@
              (/ (.getZ v1) (.getZ v2))
              (/ (.getW v1) (.getW v2))))
 
-(defn- scale-4d [^Vector4D v ^double f]
+(defn scale-4d [^Vector4D v ^double f]
   (Vector4D. (* (.getX v) f)
              (* (.getY v) f)
              (* (.getZ v) f)
