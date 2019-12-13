@@ -1,6 +1,5 @@
-(ns computer-graphics-coursework-backend.render.triangle
-  (:require [computer_graphics_coursework_backend.math.vector :as vec])
-  (:import (computer_graphics_coursework_backend.render.triangle TriangleMath)))
+(ns computer_graphics_coursework_backend.render.triangle
+  (:require [computer_graphics_coursework_backend.math.vector :as vec]))
 
 (defprotocol CheckDegenerate
   (is-degenerate [this]))

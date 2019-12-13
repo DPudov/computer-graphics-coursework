@@ -26,8 +26,6 @@
 
 (def voxel-base-count (atom 256))
 
-
-
 (defn fill-lookup-table
   [voxels]
   (let [count @voxel-base-count
@@ -64,12 +62,6 @@
               :let [el (aget a j i)]]
           ()))
       (conj result maxFace))))
-
-
-
-
-
-
 
 (defn generate-voxel-mesh
   [voxels]

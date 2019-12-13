@@ -5,12 +5,12 @@
            (java.awt Color)))
 
 (defprotocol Outsider
-  (is-outside []))
+  (is-outside [this]))
 
 (defrecord Vertex
   [position normal texture color output]
   Outsider
-  (is-outside [] (vec/is-outside output)))
+  (is-outside [this] (vec/is-outside output)))
 
 (defn interpolate-scalars
   [v1 v2 v3 b]

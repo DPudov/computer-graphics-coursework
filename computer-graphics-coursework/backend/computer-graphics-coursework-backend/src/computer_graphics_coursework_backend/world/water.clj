@@ -1,4 +1,5 @@
-(ns computer-graphics-coursework-backend.world.water)
+(ns computer-graphics-coursework-backend.world.water
+  (:import (computer_graphics_coursework_backend.render.voxel Voxel)))
 
 (def friction 0.125)
 
@@ -6,10 +7,21 @@
   [length height dim]
   (let [terrain-center (/ dim 2)
         l2 (/ length 2)
-        water (make-array Integer/TYPE dim dim)]
+        water (make-array Double/TYPE dim dim)]
     (for [i (range (- terrain-center l2) (+ terrain-center l2))]
       (for [j (range (- terrain-center l2) (+ terrain-center l2))]
         (aset water i j height)))))
+
+(defn init-water-energy
+  [dim]
+  (make-array Double/TYPE dim dim))
+
+(def l 10)
+(def h 30)
+(def dim 50)
+
+(def water-map (atom (init-water-prism l h dim)))
+(def energy-map (atom (init-water-energy dim)))
 
 (defn update-water
   [terrain old-water old-energy dim]
@@ -72,15 +84,15 @@
               (aset new-water i (+ j 1) (+ (aget new-water i (+ j 1)) flow))
               (aset new-water i j (+ (aget new-water i j) (- flow)))
               (aset new-energy i (+ j 1) (* (aget new-energy i (+ j 1)) (- 1 friction)))
-              (aset new-energy i (+ j 1) (+ (aget new-energy i (+ j 1)) flow)))))))))
+              (aset new-energy i (+ j 1) (+ (aget new-energy i (+ j 1)) flow)))))))
+    [new-water new-energy]))
 
-
-
-
-(defn init-water-energy
-  [dim]
-  (make-array Integer/TYPE dim dim))
 
 
 (defn get-water-voxels
-  [])
+  [dim terrain-map water-map stroke-color]
+  (let [voxels []]
+    (dotimes [i dim]
+      (dotimes [j dim]
+        (for [k range (aget terrain-map i j) (+ (int (aget water-map i j)) (aget terrain-map i j))]
+          (conj voxels (Voxel. i k j stroke-color)))))))

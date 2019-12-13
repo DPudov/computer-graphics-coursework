@@ -19,50 +19,22 @@
 
 (def desired-fps 30)
 
-
-
 (defn time-ms-by-fps
   [fps]
   (/ 1000 fps))
 
-(defprotocol SceneAPI
-  (get-terrain [this] "get terrain as 3d array")
-  (get-water [this] "get water as 3d array")
-  (get-energy [this] "get water energy")
-  (get-current-simulation-time [this] "return aggregated simulation")
-  (inc-simulation-time [this amount])
-  (update-water [this]))
-
-
-(def model-matrix
-  (Matrix4D. 1.0 0.0 0.0 0.0
-             0.0 1.0 0.0 0.0
-             0.0 0.0 1.0 0.0
-             0.0 0.0 0.0 1.0))
-(def vAf (Vector4D. -1 1 1 1))
-(def vBf (Vector4D. 1 1 1 1))
-(def vCf (Vector4D. 1 -1 1 1))
-(def vDf (Vector4D. -1 -1 1 1))
-(def vAb (Vector4D. -1 1 3 1))
-(def vBb (Vector4D. 1 1 3 1))
-(def vCb (Vector4D. 1 -1 3 1))
-(def vDb (Vector4D. -1 -1 3 1))
-
-;(defn draw-cube-another
-;  [canvas camera]
-;  (let [mvp (camera/model-view-projection-matrix (camera/perspective (:position camera))
-;                                                 ;(camera/compute-third-person-camera (:position camera) @camera/target camera/up)
-;                                                 (camera/get-view-matrix camera)
-;                                                 model-matrix)
-;        viewport [(.getWidth canvas) (.getHeight canvas)]]
-;    (terrain/render-to canvas (.getWidth canvas) mvp viewport)))
-
+(def dim 50)
+(defn update-arr [arr new-arr]
+  new-arr)
 (defn create-timer
   [tick-time canvas]
   (let []
     (Timer. tick-time (reify ActionListener
                         (actionPerformed [this e]
-                          ;(swap! camera/camera-position camera/rotate-camera delta-angle)
+                          (let [[new-water new-energy]
+                                (water/update-water (terrain/init-terrain-memo dim) @water/water-map @water/energy-map dim)]
+                            (swap! water/water-map update-arr new-water)
+                            (swap! water/energy-map update-arr new-energy))
                           (.repaint canvas))))))
 
 (defn clear [canvas]
@@ -77,24 +49,21 @@
   (let [w (.getWidth c) w2 (/ w 2)
         h (.getHeight c) h2 (/ h 2)
         canvas (BufferedImage. w h BufferedImage/TYPE_INT_ARGB)
-        terrain (terrain/get-terrain-voxels 50)
-        water (water/get-water-voxels)
+        terrain-map (terrain/init-terrain-memo dim)
+        water-map @water/water-map
+        terrain (terrain/get-terrain-voxels-memo dim)
+        water (water/get-water-voxels dim terrain-map water-map Color/BLUE)
         voxels (vec (concat terrain water))]
     (clear canvas)
     (drawer/draw-voxels canvas voxels @camera/cam)
-    ;(draw-cube-another canvas @camera/cam)
-    ;(camera/rasterize canvas [vAf vBf vCf vDf vAb vBb vCb vDb] camera/move-camera-right);(terrain/render-to canvas w))
     (.drawImage g canvas nil nil)))
-
-
 
 (defn generate-world [root]
   (let [canvas (select root [:#canvas])
         timer (create-timer (time-ms-by-fps desired-fps) canvas)]
 
-    ;(.start timer)
+    (.start timer)
     (-> canvas
-        ;(.setFocusable true)
         (request-focus!)
         (config! :paint paint-frame)
         (listen :key-pressed

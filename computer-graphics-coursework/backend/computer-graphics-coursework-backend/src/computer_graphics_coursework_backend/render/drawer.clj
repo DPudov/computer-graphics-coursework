@@ -1,14 +1,18 @@
 (ns computer_graphics_coursework_backend.render.drawer
   (:require [computer_graphics_coursework_backend.math.vector :as vec]
             [computer_graphics_coursework_backend.render.voxel :as voxel]
-            [computer_graphics_coursework_backend.render.camera :as camera])
+            [computer_graphics_coursework_backend.render.camera :as camera]
+            [computer_graphics_coursework_backend.render.vertex :as vertex])
   (:import java.awt.image.BufferedImage
            (computer_graphics_coursework_backend.math.vector Vector3D Vector2D)
            (java.awt Color)
-           (computer_graphics_coursework_backend.math.matrix Matrix4D)))
+           (computer_graphics_coursework_backend.math.matrix Matrix4D)
+           (computer_graphics_coursework_backend.render.triangle Triangle)))
 (def width 640)
 
 (def height 480)
+
+
 
 (defn put-pixel [^BufferedImage image-buffer x y ^Color color]
   (.setRGB image-buffer x y (.getRGB color)))
@@ -25,11 +29,6 @@
   (let [g (.getGraphics image-buffer)]
     (.setColor g color)
     (.drawLine g xb yb xe ye)))
-;(-> g
-;    (.setBackground Color/CYAN)
-;    (println image-buffer xb yb xe ye color))))
-;(.setStroke color)
-;(.drawLine xb yb xe ye))))
 
 (defn draw-line
   [^BufferedImage image-buffer xb yb xe ye ^Color color]
@@ -85,6 +84,26 @@
              0.0 1.0 0.0 0.0
              0.0 0.0 1.0 0.0
              0.0 0.0 0.0 1.0))
+(defn draw-clipped-triangle
+  [triangle]
+  (let [v1 (:v1 triangle)
+        v2 (:v2 triangle)
+        v3 (:v3 triangle)
+        x1 ((:position ))
+        back-face-culling ((:x v1))]))
+
+(defn draw-triangle
+  [triangle]
+  (let [v1 (shader (:v1 triangle))
+        v2 (shader (:v2 triangle))
+        v3 (shader (:v3 triangle))]
+    (if (or (vertex/is-outside v1) (vertex/is-outside v2) (vertex/is-outside v3))
+      (let [triangles (clip-triangle v1 v2 v3)]
+        (pmap draw-clipped-triangle triangles))
+      (draw-clipped-triangle triangle))))
+(defn draw-triangles
+  [triangles]
+  (pmap draw-triangle triangles))
 
 (defn draw-voxels
   [^BufferedImage canvas voxels camera]
