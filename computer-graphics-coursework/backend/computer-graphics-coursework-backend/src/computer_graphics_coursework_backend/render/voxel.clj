@@ -1,8 +1,10 @@
 (ns computer_graphics_coursework_backend.render.voxel
   (:require [computer_graphics_coursework_backend.render.mesh])
-  (:import (computer_graphics_coursework_backend.math.vector Vector4D)
+  (:import (computer_graphics_coursework_backend.math.vector Vector4D Vector3D)
            (computer_graphics_coursework_backend.render.mesh Mesh)
-           (java.util HashMap)))
+           (java.util HashMap)
+           (computer_graphics_coursework_backend.render.triangle Triangle)
+           (computer_graphics_coursework_backend.render.vertex Vertex)))
 
 (defrecord Voxel
   [x y z color])
@@ -140,10 +142,71 @@
 
 
 
-(defn triangulate-faces-single-plane [faces-for-plane])
+(defn triangle-for-points
+  "Generate triangle from points"
+  [p1 p2 p3 c]
+  (Triangle.
+    (Vertex. p1 nil nil c nil)
+    (Vertex. p2 nil nil c nil)
+    (Vertex. p3 nil nil c nil)))
 
 
-(defn outline-faces-single-plane [faces-for-plane])
+(defn triangulate-faces-single-plane
+  "Get triangles vector from plane faces"
+  [faces-for-plane]
+  (let [plane (.getKey faces-for-plane)
+        faces (.getValue faces-for-plane)
+        k (+ (double (:position plane)) (* 0.5 (double (:sign (:normal plane)))))
+        c (:color plane)
+        axis (:axis (:normal plane))]
+    (->> faces
+         (pmap (fn [face]
+                 (let [i0 (- (:i0 face) 0.5)
+                       j0 (- (:j0 face) 0.5)
+                       i1 (+ (:i1 face) 0.5)
+                       j1 (+ (:j1 face) 0.5)
+                       p1 (cond
+                            (= axis voxel-x)
+                            (Vector3D. k i0 j0)
+                            (= axis voxel-y)
+                            (Vector3D. i0 k j1)
+                            (= axis voxel-z)
+                            (Vector3D. i0 j0 k))
+                       p2 (cond
+                            (= axis voxel-x)
+                            (Vector3D. k i1 j0)
+                            (= axis voxel-y)
+                            (Vector3D. i1 k j1)
+                            (= axis voxel-z)
+                            (Vector3D. i1 j0 k))
+                       p3 (cond
+                            (= axis voxel-x)
+                            (Vector3D. k i1 j1)
+                            (= axis voxel-y)
+                            (Vector3D. i1 k j0)
+                            (= axis voxel-z)
+                            (Vector3D. i1 j1 k))
+                       p4 (cond
+                            (= axis voxel-x)
+                            (Vector3D. k i0 j1)
+                            (= axis voxel-y)
+                            (Vector3D. i0 k j0)
+                            (= axis voxel-z)
+                            (Vector3D. i0 j1 k))]
+                   (if (neg? (:sign (:normal plane)))
+                     (let [t1 (triangle-for-points p4 p3 p2 c)
+                           t2 (triangle-for-points p4 p2 p1 c)]
+                       [t1 t2])
+                     (let [t1 (triangle-for-points p1 p2 p3 c)
+                           t2 (triangle-for-points p1 p3 p4 c)]
+                       [t1 t2])))))
+         (flatten)
+         (into []))))
+
+
+(defn outline-faces-single-plane
+  "Create outside wireframe"
+  [faces-for-plane])
 
 
 (defn generate-voxel-mesh
@@ -155,5 +218,6 @@
      plane-faces (into [] (.entrySet exposed-faces))
      faces (into [] (pmap combine-faces-single-plane plane-faces))
      triangles (into [] (pmap triangulate-faces-single-plane faces))
-     lines (into [] (pmap outline-faces-single-plane faces))]
+     lines nil]
+     ;lines (into [] (pmap outline-faces-single-plane faces))]
     (Mesh. triangles lines)))
