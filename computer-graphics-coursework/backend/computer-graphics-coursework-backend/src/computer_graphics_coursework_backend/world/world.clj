@@ -26,8 +26,8 @@
                         (actionPerformed [this e]
                           (let [[new-water new-energy]
                                 (water/update-water (terrain/init-terrain-memo dim) @water/water-map @water/energy-map dim)]
-                            (reset! water/water-map new-water)
-                            (reset! water/energy-map new-energy))
+                             (reset! water/water-map new-water)
+                             (reset! water/energy-map new-energy))
                           (.repaint canvas))))))
 
 (defn clear [canvas]
@@ -46,8 +46,6 @@
         terrain (terrain/get-terrain-voxels-memo dim)
         water (water/get-water-voxels dim terrain-map water-map Color/BLUE)
         voxels (vec (concat terrain water))]
-    (println "Terrain count" (count terrain))
-    (println "Water count" (count water))
     (drawer/draw-voxels frame voxels @camera/cam)
     (.drawImage graphics frame nil nil)))
 

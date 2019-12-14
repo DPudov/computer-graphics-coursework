@@ -43,39 +43,39 @@
   [coll elm]
   (some #(= elm %) coll))
 
-
 (defn find-exposed-faces
   [voxels lookup-table]
   (let [m (ConcurrentHashMap.)]
-    (pmap (fn [voxel]
-            (let [x (:x voxel)
-                  y (:y voxel)
-                  z (:z voxel)
-                  c (:color voxel)]
-              (if (in? lookup-table [(inc x) y z])
-                (let [plane (VoxelPlane. voxel-pos-x x c)
-                      face (VoxelFace. y z y z)]
-                  (.put m plane (conj (.get m plane) face))))
-              (if (in? lookup-table [(dec x) y z])
-                (let [plane (VoxelPlane. voxel-neg-x x c)
-                      face (VoxelFace. y z y z)]
-                  (.put m plane (conj (.get m plane) face))))
-              (if (in? lookup-table [x (inc y) z])
-                (let [plane (VoxelPlane. voxel-pos-y y c)
-                      face (VoxelFace. x z x z)]
-                  (.put m plane (conj (.get m plane) face))))
-              (if (in? lookup-table [x (dec y) z])
-                (let [plane (VoxelPlane. voxel-neg-y y c)
-                      face (VoxelFace. x z x z)]
-                  (.put m plane (conj (.get m plane) face))))
-              (if (in? lookup-table [x y (inc z)])
-                (let [plane (VoxelPlane. voxel-pos-z z c)
-                      face (VoxelFace. x y x y)]
-                  (.put m plane (conj (.get m plane) face))))
-              (if (in? lookup-table [x y (dec z)])
-                (let [plane (VoxelPlane. voxel-neg-z z c)
-                      face (VoxelFace. x y x y)]
-                  (.put m plane (conj (.get m plane) face)))))) voxels)
+    (doall (pmap (fn [voxel]
+                   (let [x (:x voxel)
+                         y (:y voxel)
+                         z (:z voxel)
+                         c (:color voxel)]
+
+                     (if (not (in? lookup-table [(inc x) y z]))
+                       (let [plane (VoxelPlane. voxel-pos-x x c)
+                             face (VoxelFace. y z y z)]
+                         (.put m plane (conj (.get m plane) face))))
+                     (if (not (in? lookup-table [(dec x) y z]))
+                       (let [plane (VoxelPlane. voxel-neg-x x c)
+                             face (VoxelFace. y z y z)]
+                         (.put m plane (conj (.get m plane) face))))
+                     (if (not (in? lookup-table [x (inc y) z]))
+                       (let [plane (VoxelPlane. voxel-pos-y y c)
+                             face (VoxelFace. x z x z)]
+                         (.put m plane (conj (.get m plane) face))))
+                     (if (not (in? lookup-table [x (dec y) z]))
+                       (let [plane (VoxelPlane. voxel-neg-y y c)
+                             face (VoxelFace. x z x z)]
+                         (.put m plane (conj (.get m plane) face))))
+                     (if (not (in? lookup-table [x y (inc z)]))
+                       (let [plane (VoxelPlane. voxel-pos-z z c)
+                             face (VoxelFace. x y x y)]
+                         (.put m plane (conj (.get m plane) face))))
+                     (if (not (in? lookup-table [x y (dec z)]))
+                       (let [plane (VoxelPlane. voxel-neg-z z c)
+                             face (VoxelFace. x y x y)]
+                         (.put m plane (conj (.get m plane) face)))))) voxels))
     m))
 
 (defn calculate-max-face [i0 j0 nj ni a h w]
@@ -221,5 +221,6 @@
      faces (into [] (pmap combine-faces-single-plane plane-faces))
      triangles (into [] (flatten (pmap triangulate-faces-single-plane faces)))
      lines nil]
+    (println "exposed-faces" (.size exposed-faces) "plane-faces" (.size (.entrySet exposed-faces)))
     ;lines (into [] (pmap outline-faces-single-plane faces))]
     (Mesh. triangles lines)))

@@ -18,7 +18,7 @@
   (make-array Double/TYPE dim dim))
 
 (def l 10)
-(def h 30)
+(def h 10)
 (def dim 50)
 
 (def water-map (atom (init-water-prism l h dim)))
@@ -30,15 +30,15 @@
         new-energy old-energy]
     (dotimes [i dim]
       (dotimes [j dim]
-        (let [left-pressure (if (> i 0) (+ (aget terrain (- i 1) j)
-                                           (aget old-water (- i 1) j)
-                                           (aget old-energy (- i 1) j)) 0)
-              right-pressure (if (< i (- dim 1)) (+ (aget terrain (+ i 1) j)
-                                                    (aget old-water (+ i 1) j)
-                                                    (- (aget old-energy (+ i 1) j))) 0)
-              back-pressure (if (> j 0) (+ (aget terrain i (- j 1))
-                                           (aget old-water i (- j 1))
-                                           (aget old-energy i (- j 1))) 0)
+        (let [left-pressure (if (> i 0) (+ (aget terrain (dec i) j)
+                                           (aget old-water (dec i) j)
+                                           (aget old-energy (dec i) j)) 0)
+              right-pressure (if (< i (dec dim)) (+ (aget terrain (inc i) j)
+                                                    (aget old-water (inc i) j)
+                                                    (- (aget old-energy (inc i) j))) 0)
+              back-pressure (if (> j 0) (+ (aget terrain i (dec j))
+                                           (aget old-water i (dec j))
+                                           (aget old-energy i (dec j))) 0)
               front-pressure (if (< j (dec dim)) (+ (aget terrain i (inc j))
                                                     (aget old-water i (inc j))
                                                     (- (aget old-energy i (inc j)))) 0)]
@@ -49,21 +49,21 @@
                                   (- (aget old-energy i j))
                                   (- left-pressure)))
                           16)]
-              (aset new-water (- i 1) j (+ (aget new-water (- i 1) j) flow))
+              (aset new-water (dec i) j (+ (aget new-water (dec i) j) flow))
               (aset new-water i j (+ (aget new-water i j) (- flow)))
-              (aset new-energy (- i 1) j (* (aget new-energy (- i 1) j) (- 1 friction)))
-              (aset new-energy (- i 1) j (+ (aget new-energy (- i 1) j) (- flow)))))
-          (if (and (< i (- dim 1)) (> (+ (aget terrain i j) (aget old-water i j) (aget old-energy i j)) right-pressure))
+              (aset new-energy (dec i) j (* (aget new-energy (dec i) j) (- 1 friction)))
+              (aset new-energy (dec i) j (+ (aget new-energy (dec i) j) (- flow)))))
+          (if (and (< i (dec dim)) (> (+ (aget terrain i j) (aget old-water i j) (aget old-energy i j)) right-pressure))
             (let [flow (/ (min (aget old-water i j)
                                (+ (aget terrain i j)
                                   (aget old-water i j)
                                   (aget old-energy i j)
                                   (- right-pressure)))
                           16)]
-              (aset new-water (+ i 1) j (+ (aget new-water (+ i 1) j) flow))
+              (aset new-water (inc i) j (+ (aget new-water (inc i) j) flow))
               (aset new-water i j (+ (aget new-water i j) (+ flow)))
-              (aset new-energy (+ i 1) j (* (aget new-energy (+ i 1) j) (- 1 friction)))
-              (aset new-energy (+ i 1) j (+ (aget new-energy (+ i 1) j) flow))))
+              (aset new-energy (inc i) j (* (aget new-energy (inc i) j) (- 1 friction)))
+              (aset new-energy (inc i) j (+ (aget new-energy (inc i) j) flow))))
           (if (and (> j 0) (> (+ (aget terrain i j) (aget old-water i j) (- (aget old-energy i j))) back-pressure))
             (let [flow (/ (min (aget old-water i j)
                                (+ (aget terrain i j)
@@ -71,21 +71,21 @@
                                   (- (aget old-energy i j))
                                   (- back-pressure)))
                           16)]
-              (aset new-water i (- j 1) (+ (aget new-water i (- j 1)) flow))
+              (aset new-water i (dec j) (+ (aget new-water i (dec j)) flow))
               (aset new-water i j (+ (aget new-water i j) (- flow)))
-              (aset new-energy i (- j 1) (* (aget new-energy i (- j 1)) (- 1 friction)))
-              (aset new-energy i (- j 1) (+ (aget new-energy i (- j 1)) (- flow)))))
-          (if (and (< j (- dim 1)) (> (+ (aget terrain i j) (aget old-water i j) (aget old-energy i j)) front-pressure))
+              (aset new-energy i (dec j) (* (aget new-energy i (dec j)) (- 1 friction)))
+              (aset new-energy i (dec j) (+ (aget new-energy i (dec j)) (- flow)))))
+          (if (and (< j (dec dim)) (> (+ (aget terrain i j) (aget old-water i j) (aget old-energy i j)) front-pressure))
             (let [flow (/ (min (aget old-water i j)
                                (+ (aget terrain i j)
                                   (aget old-water i j)
                                   (aget old-energy i j)
                                   (- front-pressure)))
                           16)]
-              (aset new-water i (+ j 1) (+ (aget new-water i (+ j 1)) flow))
+              (aset new-water i (inc j) (+ (aget new-water i (inc j)) flow))
               (aset new-water i j (+ (aget new-water i j) (- flow)))
-              (aset new-energy i (+ j 1) (* (aget new-energy i (+ j 1)) (- 1 friction)))
-              (aset new-energy i (+ j 1) (+ (aget new-energy i (+ j 1)) flow)))))))
+              (aset new-energy i (inc j) (* (aget new-energy i (inc j)) (- 1 friction)))
+              (aset new-energy i (inc j) (+ (aget new-energy i (inc j)) flow)))))))
     [new-water new-energy]))
 
 
@@ -93,8 +93,13 @@
 (defn get-water-voxels
   [dim terrain-map water-map stroke-color]
   (let [voxels (atom [])]
-    (dotimes [i dim]
-      (dotimes [j dim]
-        (doseq [k (range (aget terrain-map i j) (+ (int (aget water-map i j)) (aget terrain-map i j)))]
-          (swap! voxels conj (Voxel. i k j stroke-color)))))
+    (doall
+      (pmap (fn [i]
+              (doall (pmap (fn [j]
+                             (doseq [k (range (aget terrain-map i j) (+ (int (aget water-map i j)) (aget terrain-map i j)))]
+                               (swap! voxels conj (Voxel. i k j stroke-color)))) (range dim)))) (range dim)))
     @voxels))
+;(dotimes [i dim]
+;  (dotimes [j dim]
+
+;@voxels ) )
