@@ -2,7 +2,7 @@
   (:require [computer_graphics_coursework_backend.render.mesh :as mesh]
             [computer_graphics_coursework_backend.render.triangle :as triangle]
             [computer_graphics_coursework_backend.render.vertex :as vertex])
-  (:import (computer_graphics_coursework_backend.math.vector Vector3D)
+  (:import (computer_graphics_coursework_backend.math.vector Vector3D Vector4D)
            (computer_graphics_coursework_backend.render.mesh Mesh)
            (java.util HashMap)
            (java.util.concurrent ConcurrentHashMap ConcurrentHashMap$MapEntry)))
@@ -94,7 +94,7 @@
         (reset! minw (aget w j i))
         (doseq [dh (range (aget h j i))]
           (if (< (aget w (- j dh) i) @minw)
-            (reset! minw (aget w (- j dh i))))
+            (reset! minw (aget w (- j dh) i)))
           (let [area (* (inc dh) @minw)]
             (if (> area @max-area)
               (do
@@ -169,32 +169,32 @@
                        j1 (+ (:j1 face) 0.5)
                        p1 (cond
                             (= axis voxel-x)
-                            (Vector3D. k i0 j0)
+                            (Vector4D. k i0 j0 1)
                             (= axis voxel-y)
-                            (Vector3D. i0 k j1)
+                            (Vector4D. i0 k j1 1)
                             (= axis voxel-z)
-                            (Vector3D. i0 j0 k))
+                            (Vector4D. i0 j0 k 1))
                        p2 (cond
                             (= axis voxel-x)
-                            (Vector3D. k i1 j0)
+                            (Vector4D. k i1 j0 1)
                             (= axis voxel-y)
-                            (Vector3D. i1 k j1)
+                            (Vector4D. i1 k j1 1)
                             (= axis voxel-z)
-                            (Vector3D. i1 j0 k))
+                            (Vector4D. i1 j0 k 1))
                        p3 (cond
                             (= axis voxel-x)
-                            (Vector3D. k i1 j1)
+                            (Vector4D. k i1 j1 1)
                             (= axis voxel-y)
-                            (Vector3D. i1 k j0)
+                            (Vector4D. i1 k j0 1)
                             (= axis voxel-z)
-                            (Vector3D. i1 j1 k))
+                            (Vector4D. i1 j1 k 1))
                        p4 (cond
                             (= axis voxel-x)
-                            (Vector3D. k i0 j1)
+                            (Vector4D. k i0 j1 1)
                             (= axis voxel-y)
-                            (Vector3D. i0 k j0)
+                            (Vector4D. i0 k j0 1)
                             (= axis voxel-z)
-                            (Vector3D. i0 j1 k))]
+                            (Vector4D. i0 j1 k 1))]
                    (if (neg? (:sign (:normal plane)))
                      (let [t1 (triangle-for-points p4 p3 p2 c)
                            t2 (triangle-for-points p4 p2 p1 c)]
@@ -219,7 +219,7 @@
      exposed-faces (find-exposed-faces voxels lookup-table)
      plane-faces (into [] (.entrySet exposed-faces))
      faces (into [] (pmap combine-faces-single-plane plane-faces))
-     triangles (into [] (pmap triangulate-faces-single-plane faces))
+     triangles (into [] (flatten (pmap triangulate-faces-single-plane faces)))
      lines nil]
     ;lines (into [] (pmap outline-faces-single-plane faces))]
     (Mesh. triangles lines)))

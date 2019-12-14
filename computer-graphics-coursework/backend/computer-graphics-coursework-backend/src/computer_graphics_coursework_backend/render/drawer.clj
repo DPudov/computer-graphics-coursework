@@ -99,9 +99,9 @@
     (Vector4D. u v w 1)))
 
 (defn clip-triangle [v1 v2 v3]
-  (let [w1 (:output v1)
-        w2 (:output v2)
-        w3 (:output v3)
+  (let [w1 (:position v1)
+        w2 (:position v2)
+        w3 (:position v3)
         points [w1 w2 w3]
         new-points (sutherland-hodgman points clip-planes)
         result (atom [])]
@@ -116,32 +116,45 @@
         (swap! result conj new-triangle)))))
 
 (defn draw-clipped-triangle
-  [canvas triangle]
-
-  (let [v1 (:v1 triangle)
-        v2 (:v2 triangle)
-        v3 (:v3 triangle)]))
-    ;x1 ((:position))
-    ;back-face-culling ((:x v1))]))
+  [canvas triangle mvp viewport]
+  (let [p1 (camera/project-to-screen (:position (:v1 triangle)) mvp viewport)
+        p2 (camera/project-to-screen (:position (:v2 triangle)) mvp viewport)
+        p3 (camera/project-to-screen (:position (:v3 triangle)) mvp viewport)
+        c (:color (:v1 triangle))]
+    (draw-line-fast canvas (p1 0) (p1 1) (p2 0)
+                    (p2 1) c)
+    (draw-line-fast canvas (p2 0) (p2 1) (p3 0)
+                    (p3 1) c)
+    (draw-line-fast canvas (p1 0) (p1 1) (p3 0)
+                    (p3 1) c)))
+;x1 ((:position))
+;back-face-culling ((:x v1))]))
 
 (defn draw-triangles
-  [canvas triangles]
-  (pmap (fn [triangle]
-          (let [v1 (:v1 triangle)
-                v2 (:v2 triangle)
-                v3 (:v3 triangle)]
-            (if (or (vertex/is-outside v1) (vertex/is-outside v2) (vertex/is-outside v3))
-              (let [triangles (clip-triangle v1 v2 v3)]
-                (pmap (fn [triangle] (let [v1 (:v1 triangle)
-                                           v2 (:v2 triangle)]
-                                       (draw-line-fast canvas ((:position v1) 0) ((:position v1) 1) ((:position v2) 0)
-                                                       ((:position v2) 1) (:color v1)))) triangles))
-              (draw-clipped-triangle canvas triangle)))) triangles))
+  [canvas triangles mvp]
+  (let
+    [viewport [(.getWidth canvas) (.getHeight canvas)]]
+    (count (pmap (fn [triangle]
+                   (let [v1 (:v1 triangle)
+                         v2 (:v2 triangle)
+                         v3 (:v3 triangle)]
+                     (if (or (vertex/is-outside v1) (vertex/is-outside v2) (vertex/is-outside v3))
+                       (let [triangles (clip-triangle v1 v2 v3)]
+                         (count (pmap (fn [triangle] (let [p1 (camera/project-to-screen (:position (:v1 triangle)) mvp viewport)
+                                                           p2 (camera/project-to-screen (:position (:v2 triangle)) mvp viewport)
+                                                           p3 (camera/project-to-screen (:position (:v3 triangle)) mvp viewport)
+                                                           c (:color v1)]
+                                                       (draw-line-fast canvas (p1 0) (p1 1) (p2 0)
+                                                                       (p2 1) c)
+                                                       (draw-line-fast canvas (p2 0) (p2 1) (p3 0)
+                                                                       (p3 1) c)
+                                                       (draw-line-fast canvas (p1 0) (p1 1) (p3 0)
+                                                                       (p3 1) c))) triangles)))
+                       (draw-clipped-triangle canvas triangle mvp viewport)))) triangles))))
 
-(defn draw-mesh [canvas mesh]
+(defn draw-mesh [canvas mesh mvp]
   (let [triangles (:triangles mesh)]
-    (println "Triangles count" (count triangles))
-    (draw-triangles canvas triangles)))
+    (draw-triangles canvas triangles mvp)))
 
 (defn draw-voxels
   [^BufferedImage canvas voxels camera]
@@ -149,7 +162,7 @@
         mvp (camera/model-view-projection-matrix (camera/perspective (:position camera))
                                                  (camera/get-view-matrix camera)
                                                  model-matrix)]
-    (draw-mesh canvas mesh)))
+    (draw-mesh canvas mesh mvp)))
 
 
 

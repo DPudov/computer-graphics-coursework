@@ -4,13 +4,9 @@
   (:import (computer_graphics_coursework_backend.math.vector Vector4D Vector3D)
            (java.awt Color)))
 
-(defprotocol Outsider
-  (is-outside [this]))
-
 (defrecord Vertex
-  [position normal texture color output]
-  Outsider
-  (is-outside [this] (vec/is-outside output)))
+  [position normal texture color output])
+(defn is-outside [this] (vec/is-outside (:position this)))
 
 (defn interpolate-scalars
   [v1 v2 v3 b]
@@ -26,8 +22,8 @@
   [v1 v2 v3 b]
   (let [n (Color. 0 0 0 0)]
     (reduce color/sum-colors [n (color/scale-color v1 (b 0))
-                                (color/scale-color v2 (b 1))
-                                (color/scale-color v3 (b 2))])))
+                              (color/scale-color v2 (b 1))
+                              (color/scale-color v3 (b 2))])))
 
 (defn interpolate-vecs-3d
   [v1 v2 v3 b]
