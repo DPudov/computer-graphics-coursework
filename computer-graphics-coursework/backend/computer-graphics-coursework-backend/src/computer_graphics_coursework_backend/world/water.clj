@@ -111,8 +111,11 @@
     (doall
       (pmap (fn [i]
               (doall (pmap (fn [j]
-                             (doseq [k (range (aget terrain-map i j) (+ (int (aget water-map i j)) (aget terrain-map i j)))]
-                               (swap! voxels conj (Voxel. i k j stroke-color)))) (range dim)))) (range dim)))
+                             (let
+                               [^ints terrain-row-cur (aget ^objects terrain-map i)
+                                ^doubles water-row-cur (aget ^objects water-map i)]
+                               (doseq [k (range (aget terrain-row-cur j) (+ (int (aget water-row-cur j)) (aget terrain-row-cur j)))]
+                                 (swap! voxels conj (Voxel. i k j stroke-color))))) (range dim)))) (range dim)))
     @voxels))
 ;(dotimes [i dim]
 ;  (dotimes [j dim]

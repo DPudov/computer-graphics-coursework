@@ -52,27 +52,27 @@
                          z (:z voxel)
                          c (:color voxel)]
 
-                     (if (not (in? lookup-table [(inc x) y z]))
+                     (if-not (in? lookup-table [(inc x) y z])
                        (let [plane (VoxelPlane. voxel-pos-x x c)
                              face (VoxelFace. y z y z)]
                          (.put m plane (conj (.get m plane) face))))
-                     (if (not (in? lookup-table [(dec x) y z]))
+                     (if-not (in? lookup-table [(dec x) y z])
                        (let [plane (VoxelPlane. voxel-neg-x x c)
                              face (VoxelFace. y z y z)]
                          (.put m plane (conj (.get m plane) face))))
-                     (if (not (in? lookup-table [x (inc y) z]))
+                     (if-not (in? lookup-table [x (inc y) z])
                        (let [plane (VoxelPlane. voxel-pos-y y c)
                              face (VoxelFace. x z x z)]
                          (.put m plane (conj (.get m plane) face))))
-                     (if (not (in? lookup-table [x (dec y) z]))
+                     (if-not (in? lookup-table [x (dec y) z])
                        (let [plane (VoxelPlane. voxel-neg-y y c)
                              face (VoxelFace. x z x z)]
                          (.put m plane (conj (.get m plane) face))))
-                     (if (not (in? lookup-table [x y (inc z)]))
+                     (if-not (in? lookup-table [x y (inc z)])
                        (let [plane (VoxelPlane. voxel-pos-z z c)
                              face (VoxelFace. x y x y)]
                          (.put m plane (conj (.get m plane) face))))
-                     (if (not (in? lookup-table [x y (dec z)]))
+                     (if-not (in? lookup-table [x y (dec z)])
                        (let [plane (VoxelPlane. voxel-neg-z z c)
                              face (VoxelFace. x y x y)]
                          (.put m plane (conj (.get m plane) face)))))) voxels))
@@ -82,19 +82,23 @@
   (let [max-face (atom (VoxelFace. 0 0 0 0))
         max-area (atom 0)
         minw (atom 0)]
-    (doseq [j (range nj)]
+    (doseq [j (range nj)
+            :let [^ints a-row (aget ^objects a j)
+                  ^ints h-row (aget ^objects h j)
+                  ^ints w-row (aget ^objects w j)]]
       (doseq [i (range ni)
-              :when (not (zero? (aget a j i)))]
+              :when (not (zero? (aget a-row i)))]
         (if (zero? j)
-          (aset h j i (int 1))
-          (aset h j i (int (inc (aget h (dec j) i)))))
+          (aset h-row i (int 1))
+          (aset h-row i (int (inc (aget h (dec j) i)))))
         (if (zero? i)
-          (aset w j i (int 1))
-          (aset w j i (int (inc (aget w j (dec i))))))
-        (reset! minw (aget w j i))
-        (doseq [dh (range (aget h j i))]
-          (if (< (aget w (- j dh) i) @minw)
-            (reset! minw (aget w (- j dh) i)))
+          (aset w-row i (int 1))
+          (aset w-row i (int (inc (aget w j (dec i))))))
+        (reset! minw (aget w-row i))
+        (doseq [dh (range (aget h-row i))
+                :let [^ints w-row-cur (aget ^objects w (- j dh))]]
+          (if (< (aget w-row-cur i) @minw)
+            (reset! minw (aget w-row-cur i)))
           (let [area (* (inc dh) @minw)]
             (if (> area @max-area)
               (do
@@ -123,22 +127,26 @@
         h (make-array Integer/TYPE nj ni)
         counter (atom 0)]
     (doseq [f faces]
-      (doseq [j (range (:j0 f) (inc (:j1 f)))]
+      (doseq [j (range (:j0 f) (inc (:j1 f)))
+              :let [^ints a-row (aget ^objects a (- j j0-bound))]]
         (doseq [i (range (:i0 f) (inc (:i1 f)))]
-          (aset-int a (- j j0-bound) (- i i0-bound) (int 1))
+          (aset a-row (- i i0-bound) (int 1))
           (swap! counter inc))))
     [plane (loop [c @counter
                   result (transient [])]
              (if (> c 0)
                (let [max-face (calculate-max-face i0-bound j0-bound nj ni a h w)]
-                 (doseq [j (range (:j0 max-face) (inc (:j1 max-face)))]
+                 (doseq [j (range (:j0 max-face) (inc (:j1 max-face)))
+                         :let [^ints a-row (aget ^objects a (- j j0-bound))]]
                    (doseq [i (range (:i0 max-face) (inc (:i1 max-face)))]
-                     (aset-int a (- j j0-bound) (- i i0-bound) (int 0))
+                     (aset a-row (- i i0-bound) (int 0))
                      (swap! counter dec)))
-                 (doseq [j (range nj)]
+                 (doseq [j (range nj)
+                         :let [^ints w-row (aget ^objects w j)
+                               ^ints h-row (aget ^objects h j)]]
                    (doseq [i (range ni)]
-                     (aset-int w j i (int 0))
-                     (aset-int h j i (int 0))))
+                     (aset-int w-row i (int 0))
+                     (aset-int h-row i (int 0))))
                  (recur @counter (conj! result max-face)))
                (persistent! result)))]))
 
@@ -221,5 +229,6 @@
      faces (pmap combine-faces-single-plane plane-faces)
      triangles (flatten (pmap triangulate-faces-single-plane faces))
      lines nil]
+    ;(time (find-exposed-faces voxels lookup-table))
     ;lines (into [] (pmap outline-faces-single-plane faces))]
     (Mesh. triangles lines)))

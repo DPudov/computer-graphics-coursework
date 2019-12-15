@@ -36,13 +36,14 @@
   (let
     [terrain (make-array Integer/TYPE dim dim)]
     (dotimes [i dim]
-      (dotimes [j dim]
-        (if (not (or (= i 0) (= i (dec dim)) (= j 0) (= j (dec dim))))
-          (aset terrain i j
-                (int (calculate-height (parabolic-height dim i j)
-                                       (noised-height dim i j terrain-noise))))
-          (aset terrain i j
-                (int (* 100 dim))))))
+      (let [^ints terrain-row (aget ^objects terrain i)]
+        (dotimes [j dim]
+          (if (not (or (= i 0) (= i (dec dim)) (= j 0) (= j (dec dim))))
+            (aset terrain-row j
+                  (int (calculate-height (parabolic-height dim i j)
+                                         (noised-height dim i j terrain-noise))))
+            (aset terrain-row j
+                  (int (* 100 dim)))))))
     terrain))
 
 (def init-terrain-memo
@@ -52,23 +53,19 @@
   [dim]
   (let [terrain-map (init-terrain-memo dim)
         voxels (atom [])]
-    ; print mountains to terminal
-    ;(dotimes [i dim]
-    ;  (dotimes [j dim]
-    ;    (if (= j (dec dim)) (println (aget terrain-map i j))
-    ;                    (print (aget terrain-map i j) " "))))
     (doseq [i (range 1 (dec dim))]
-      (doseq [j (range 1 (dec dim))]
-        (dotimes [k (aget terrain-map i j)]
-          ;(let [hue (int (* 50 (perlin/noise (/ (* hue-noise i) dim)
-          ;                                   (/ (* hue-noise j) dim)
-          ;                                   (/ (* hue-noise k) dim))))
-          ;      saturation (int (+ 50 (* 100 (perlin/noise (+ 1000 (/ (* saturation-noise i) dim))
-          ;                                                (/ (* saturation-noise j) dim)
-          ;                                                (/ (* saturation-noise k) dim)))))
-          ;      brightness 150
-          ;      stroke-color (Color. (hsb-to-rgb hue saturation brightness))]
-            (swap! voxels conj (Voxel. i k j Color/DARK_GRAY)))))
+      (let [^ints terrain-row (aget ^objects terrain-map i)]
+        (doseq [j (range 1 (dec dim))]
+          (dotimes [k (aget terrain-row j)]
+            ;(let [hue (int (* 50 (perlin/noise (/ (* hue-noise i) dim)
+            ;                                   (/ (* hue-noise j) dim)
+            ;                                   (/ (* hue-noise k) dim))))
+            ;      saturation (int (+ 50 (* 100 (perlin/noise (+ 1000 (/ (* saturation-noise i) dim))
+            ;                                                (/ (* saturation-noise j) dim)
+            ;                                                (/ (* saturation-noise k) dim)))))
+            ;      brightness 150
+            ;      stroke-color (Color. (hsb-to-rgb hue saturation brightness))]
+              (swap! voxels conj (Voxel. i k j Color/DARK_GRAY))))))
     @voxels))
 
 (def get-terrain-voxels-memo
