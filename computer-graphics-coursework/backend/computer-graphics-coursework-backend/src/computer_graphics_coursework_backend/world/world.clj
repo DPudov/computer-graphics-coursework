@@ -7,8 +7,8 @@
             [computer_graphics_coursework_backend.world.terrain :as terrain]
             [computer_graphics_coursework_backend.world.water :as water])
   (:import (java.awt.image BufferedImage)
-           (java.awt Color)
-           (javax.swing Timer)
+           (java.awt Color Graphics2D)
+           (javax.swing Timer JPanel)
            (java.awt.event ActionListener KeyEvent)))
 
 (def desired-fps 30)
@@ -26,8 +26,8 @@
                         (actionPerformed [this e]
                           (let [[new-water new-energy]
                                 (water/update-water (terrain/init-terrain-memo dim) @water/water-map @water/energy-map dim)]
-                             (reset! water/water-map new-water)
-                             (reset! water/energy-map new-energy))
+                            (reset! water/water-map new-water)
+                            (reset! water/energy-map new-energy))
                           (.repaint canvas))))))
 
 (defn clear [canvas]
@@ -37,7 +37,7 @@
     (.setBackground g Color/WHITE)
     (.clearRect g 0 0 w h)))
 
-(defn paint-frame [canvas graphics]
+(defn paint-frame [canvas ^Graphics2D graphics]
   (let [w (.getWidth canvas)
         h (.getHeight canvas)
         frame (BufferedImage. w h BufferedImage/TYPE_INT_ARGB)
@@ -45,12 +45,12 @@
         water-map @water/water-map
         terrain (terrain/get-terrain-voxels-memo dim)
         water (water/get-water-voxels dim terrain-map water-map Color/BLUE)
-        voxels (vec (concat terrain water))]
+        voxels (concat terrain water)]
     (drawer/draw-voxels frame voxels @camera/cam)
     (.drawImage graphics frame nil nil)))
 
 (defn generate-world [root]
-  (let [canvas (select root [:#canvas])
+  (let [^JPanel canvas (select root [:#canvas])
         timer (create-timer (time-ms-by-fps desired-fps) canvas)]
 
     (.start timer)

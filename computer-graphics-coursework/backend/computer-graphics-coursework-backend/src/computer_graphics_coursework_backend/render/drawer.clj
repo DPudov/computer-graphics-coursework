@@ -158,7 +158,6 @@
 
 (defn draw-mesh [canvas mesh mvp]
   (let [triangles (:triangles mesh)]
-    (println (count triangles))
     (draw-triangles canvas triangles mvp)))
 
 (defn draw-voxels

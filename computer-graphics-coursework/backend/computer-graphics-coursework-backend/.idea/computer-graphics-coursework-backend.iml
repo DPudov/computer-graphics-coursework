@@ -19,9 +19,24 @@
     <orderEntry type="library" name="Leiningen: com.miglayout/miglayout:3.7.4" level="project" />
     <orderEntry type="library" name="Leiningen: j18n:1.0.2" level="project" />
     <orderEntry type="library" name="Leiningen: nrepl:0.6.0" level="project" />
+    <orderEntry type="library" name="Leiningen: org.apache.commons/commons-math3:3.6.1" level="project" />
     <orderEntry type="library" name="Leiningen: org.clojure/clojure:1.10.0" level="project" />
+    <orderEntry type="library" name="Leiningen: org.clojure/core.async:0.4.490" level="project" />
+    <orderEntry type="library" name="Leiningen: org.clojure/core.cache:0.6.5" level="project" />
+    <orderEntry type="library" name="Leiningen: org.clojure/core.memoize:0.5.9" level="project" />
     <orderEntry type="library" name="Leiningen: org.clojure/core.specs.alpha:0.2.44" level="project" />
+    <orderEntry type="library" name="Leiningen: org.clojure/data.priority-map:0.0.7" level="project" />
     <orderEntry type="library" name="Leiningen: org.clojure/spec.alpha:0.2.176" level="project" />
+    <orderEntry type="library" name="Leiningen: org.clojure/tools.analyzer.jvm:0.7.2" level="project" />
+    <orderEntry type="library" name="Leiningen: org.clojure/tools.analyzer:0.6.9" level="project" />
+    <orderEntry type="library" name="Leiningen: org.clojure/tools.reader:1.0.0-beta4" level="project" />
+    <orderEntry type="library" name="Leiningen: org.jcuda/jcublas-natives:10.1.0:linux-x86_64" level="project" />
+    <orderEntry type="library" name="Leiningen: org.jcuda/jcublas:10.1.0" level="project" />
+    <orderEntry type="library" name="Leiningen: org.jcuda/jcuda-natives:10.1.0:linux-x86_64" level="project" />
+    <orderEntry type="library" name="Leiningen: org.jcuda/jcuda:10.1.0" level="project" />
+    <orderEntry type="library" name="Leiningen: org.jocl/jocl-blast:1.5.0" level="project" />
+    <orderEntry type="library" name="Leiningen: org.jocl/jocl:2.0.1" level="project" />
+    <orderEntry type="library" name="Leiningen: org.ow2.asm/asm-all:4.2" level="project" />
     <orderEntry type="library" name="Leiningen: org.swinglabs.swingx/swingx-action:1.6.3" level="project" />
     <orderEntry type="library" name="Leiningen: org.swinglabs.swingx/swingx-autocomplete:1.6.3" level="project" />
     <orderEntry type="library" name="Leiningen: org.swinglabs.swingx/swingx-common:1.6.3" level="project" />
@@ -29,5 +44,11 @@
     <orderEntry type="library" name="Leiningen: org.swinglabs.swingx/swingx-painters:1.6.3" level="project" />
     <orderEntry type="library" name="Leiningen: org.swinglabs.swingx/swingx-plaf:1.6.3" level="project" />
     <orderEntry type="library" name="Leiningen: seesaw:1.5.0" level="project" />
+    <orderEntry type="library" name="Leiningen: uncomplicate/clojurecl:0.13.0" level="project" />
+    <orderEntry type="library" name="Leiningen: uncomplicate/clojurecuda:0.8.0" level="project" />
+    <orderEntry type="library" name="Leiningen: uncomplicate/commons:0.8.0" level="project" />
+    <orderEntry type="library" name="Leiningen: uncomplicate/fluokitten:0.9.1" level="project" />
+    <orderEntry type="library" name="Leiningen: uncomplicate/neanderthal-native:0.25.0" level="project" />
+    <orderEntry type="library" name="Leiningen: uncomplicate/neanderthal:0.26.1" level="project" />
   </component>
 </module>

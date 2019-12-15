@@ -125,7 +125,7 @@
     (doseq [f faces]
       (doseq [j (range (:j0 f) (inc (:j1 f)))]
         (doseq [i (range (:i0 f) (inc (:i1 f)))]
-          (aset a (- j j0-bound) (- i i0-bound) (int 1))
+          (aset-int a (- j j0-bound) (- i i0-bound) (int 1))
           (swap! counter inc))))
     [plane (loop [c @counter
                   result (transient [])]
@@ -133,12 +133,12 @@
                (let [max-face (calculate-max-face i0-bound j0-bound nj ni a h w)]
                  (doseq [j (range (:j0 max-face) (inc (:j1 max-face)))]
                    (doseq [i (range (:i0 max-face) (inc (:i1 max-face)))]
-                     (aset a (- j j0-bound) (- i i0-bound) (int 0))
+                     (aset-int a (- j j0-bound) (- i i0-bound) (int 0))
                      (swap! counter dec)))
                  (doseq [j (range nj)]
                    (doseq [i (range ni)]
-                     (aset w j i (int 0))
-                     (aset h j i (int 0))))
+                     (aset-int w j i (int 0))
+                     (aset-int h j i (int 0))))
                  (recur @counter (conj! result max-face)))
                (persistent! result)))]))
 
@@ -217,10 +217,9 @@
   (let
     [lookup-table (fill-lookup-table voxels)
      exposed-faces (find-exposed-faces voxels lookup-table)
-     plane-faces (into [] (.entrySet exposed-faces))
-     faces (into [] (pmap combine-faces-single-plane plane-faces))
-     triangles (into [] (flatten (pmap triangulate-faces-single-plane faces)))
+     plane-faces (.entrySet exposed-faces)
+     faces (pmap combine-faces-single-plane plane-faces)
+     triangles (flatten (pmap triangulate-faces-single-plane faces))
      lines nil]
-    (println "exposed-faces" (.size exposed-faces) "plane-faces" (.size (.entrySet exposed-faces)))
     ;lines (into [] (pmap outline-faces-single-plane faces))]
     (Mesh. triangles lines)))
