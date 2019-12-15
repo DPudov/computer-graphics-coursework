@@ -2,16 +2,17 @@
   (:require [computer_graphics_coursework_backend.math.vector :as vec]
             [computer_graphics_coursework_backend.render.voxel :as voxel]
             [computer_graphics_coursework_backend.render.camera :as camera]
-            [computer_graphics_coursework_backend.render.vertex :as vertex])
+            [computer_graphics_coursework_backend.render.vertex :as vertex]
+            [computer-graphics-coursework-backend.render.shader :as shader]
+            [computer-graphics-coursework-backend.render.lights :as lights])
   (:import java.awt.image.BufferedImage
            (computer_graphics_coursework_backend.math.vector Vector4D)
-           (java.awt Color)
+           (java.awt Color Graphics)
            (computer_graphics_coursework_backend.math.matrix Matrix4D)))
 
 (def width 640)
 
 (def height 480)
-
 (defrecord ClipPlane [p n])
 
 (defrecord Triangle [v1 v2 v3])
@@ -27,6 +28,10 @@
 (defn put-pixel [^BufferedImage image-buffer x y ^Color color]
   (.setRGB image-buffer x y (.getRGB color)))
 
+
+
+
+
 (defn draw-point
   [^BufferedImage image-buffer point ^Color color]
   (let [x (int (.getX point))
@@ -35,10 +40,9 @@
       (put-pixel image-buffer x y color))))
 
 (defn draw-line-fast
-  [^BufferedImage image-buffer xb yb xe ye ^Color color]
-  (let [g (.getGraphics image-buffer)]
-    (.setColor g color)
-    (.drawLine g xb yb xe ye)))
+  [^Graphics g xb yb xe ye ^Color color]
+  (.setColor g color)
+  (.drawLine g xb yb xe ye))
 
 (def model-matrix
   (Matrix4D. 1.0 0.0 0.0 0.0
@@ -99,51 +103,50 @@
     (Vector4D. u v w 1)))
 
 (defn clip-triangle [v1 v2 v3]
-  (let [w1 (:output v1)
-        w2 (:output v2)
-        w3 (:output v3)
+  (let [w1 (:position v1)
+        w2 (:position v2)
+        w3 (:position v3)
         points [w1 w2 w3]
-        new-points (sutherland-hodgman points clip-planes)
-        result (atom [])]
-    (doseq [i (range 2 (count new-points))]
-      (let [b1 (barycentric w1 w2 w3 (first new-points))
-            b2 (barycentric w1 w2 w3 (new-points (dec i)))
-            b3 (barycentric w1 w2 w3 (new-points i))
-            v1 (vertex/interpolate-vertices v1 v2 v3 b1)
-            v2 (vertex/interpolate-vertices v1 v2 v3 b2)
-            v3 (vertex/interpolate-vertices v1 v2 v3 b3)
-            new-triangle (Triangle. v1 v2 v3)]
-        (swap! result conj new-triangle)))
-    @result))
+        new-points (sutherland-hodgman points clip-planes)]
+    (loop [i 2
+           result []]
+      (if (< i (count new-points))
+        (let [b1 (barycentric w1 w2 w3 (first new-points))
+              b2 (barycentric w1 w2 w3 (new-points (dec i)))
+              b3 (barycentric w1 w2 w3 (new-points i))
+              v1 (vertex/interpolate-vertices v1 v2 v3 b1)
+              v2 (vertex/interpolate-vertices v1 v2 v3 b2)
+              v3 (vertex/interpolate-vertices v1 v2 v3 b3)
+              new-triangle (Triangle. v1 v2 v3)]
+          (recur (inc i) (conj result new-triangle)))
+        result))))
 
 (defn draw-clipped-triangle
   [canvas triangle mvp viewport]
   (let [p1 (camera/project-to-screen (:position (:v1 triangle)) mvp viewport)
         p2 (camera/project-to-screen (:position (:v2 triangle)) mvp viewport)
         p3 (camera/project-to-screen (:position (:v3 triangle)) mvp viewport)
-        c (:color (:v1 triangle))]
-    (draw-line-fast canvas (p1 0) (p1 1) (p2 0)
+        c (:color (:v1 triangle))
+        g (.getGraphics canvas)]
+    (draw-line-fast g (p1 0) (p1 1) (p2 0)
                     (p2 1) c)
-    (draw-line-fast canvas (p2 0) (p2 1) (p3 0)
+    (draw-line-fast g (p2 0) (p2 1) (p3 0)
                     (p3 1) c)
-    (draw-line-fast canvas (p1 0) (p1 1) (p3 0)
+    (draw-line-fast g (p1 0) (p1 1) (p3 0)
                     (p3 1) c)))
 ;x1 ((:position))
 ;back-face-culling ((:x v1))]))
 
 (defn draw-triangles
-  [canvas triangles mvp]
+  [canvas triangles mvp shader]
   (let
     [viewport [(.getWidth canvas) (.getHeight canvas)]]
     (doall (pmap (fn [triangle]
                    (let [v1 (:v1 triangle)
                          v2 (:v2 triangle)
                          v3 (:v3 triangle)]
-                     (draw-clipped-triangle canvas triangle mvp viewport))) triangles))))
-
                      ;(if (or (vertex/is-outside v1) (vertex/is-outside v2) (vertex/is-outside v3))
                      ;  (let [triangles (clip-triangle v1 v2 v3)]
-                     ;    (println triangles)
                      ;    (doall (pmap (fn [triangle] (let [p1 (camera/project-to-screen (:position (:v1 triangle)) mvp viewport)
                      ;                                      p2 (camera/project-to-screen (:position (:v2 triangle)) mvp viewport)
                      ;                                      p3 (camera/project-to-screen (:position (:v3 triangle)) mvp viewport)
@@ -154,11 +157,13 @@
                      ;                                                  (p3 1) c)
                      ;                                  (draw-line-fast canvas (p1 0) (p1 1) (p3 0)
                      ;                                                  (p3 1) c))) triangles)))
-                     ;  (draw-clipped-triangle canvas triangle mvp viewport)))) triangles))))
+                       (draw-clipped-triangle canvas triangle mvp viewport))) triangles))))
 
-(defn draw-mesh [canvas mesh mvp]
-  (let [triangles (:triangles mesh)]
-    (draw-triangles canvas triangles mvp)))
+(defn draw-mesh [canvas mesh mvp camera-position]
+  (let [triangles (:triangles mesh)
+        shader (shader/phong-shader mvp @lights/light camera-position)]
+
+    (draw-triangles canvas triangles mvp shader)))
 
 (defn draw-voxels
   [^BufferedImage canvas voxels camera]
@@ -166,11 +171,10 @@
         mvp (camera/model-view-projection-matrix (camera/perspective (:position camera))
                                                  (camera/get-view-matrix camera)
                                                  model-matrix)]
-    (camera/model-view-projection-matrix (camera/perspective (:position camera))
-                                         (camera/get-view-matrix camera)
-                                         model-matrix)
-    (voxel/generate-voxel-mesh voxels)
-    (draw-mesh canvas mesh mvp)))
+    (println "Generating mesh...")
+    (time (voxel/generate-voxel-mesh voxels))
+    (println "Drawing mesh to canvas...")
+    (time (draw-mesh canvas mesh mvp (:position camera)))))
 
 
 

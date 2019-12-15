@@ -1,4 +1,6 @@
-(ns computer-graphics-coursework-backend.render.lights)
+(ns computer-graphics-coursework-backend.render.lights
+  (:require [computer_graphics_coursework_backend.math.vector :as vec])
+  (:import (computer_graphics_coursework_backend.math.vector Vector3D)))
 
 (def ambient-red (atom 1))
 (def ambient-green (atom 1))
@@ -13,3 +15,4 @@
 (def diffuse-y (atom 0))
 (def diffuse-z (atom 1))
 
+(def light (atom (vec/normalize (Vector3D. -0.25 -0.75 1))))

@@ -63,6 +63,6 @@
   [v1 v2 v3 b]
   (Vertex. (interpolate-vecs-3d (:position v1) (:position v2) (:position v3) b)
            (vec/normalize (interpolate-vecs-3d (:normal v1) (:normal v2) (:normal v3) b))
-           (interpolate-vecs-3d (:texture v1) (:texture v2) (:texture v3) b)
+           nil
            (interpolate-colors (:color v1) (:color v2) (:color v3) b)
-           (interpolate-vecs-4d (:output v1) (:output v2) (:output v3) b)))
+           nil))

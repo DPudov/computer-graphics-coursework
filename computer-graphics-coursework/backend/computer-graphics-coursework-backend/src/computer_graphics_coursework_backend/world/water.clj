@@ -25,21 +25,10 @@
 (def water-map (atom (init-water-prism l h dim)))
 (def energy-map (atom (init-water-energy dim)))
 
-(defn cpy
-  [old dim]
-  (let [new (make-array Double/TYPE dim dim)]
-    (dotimes [i dim]
-      (let [^doubles new-row (aget ^objects new i)
-            ^doubles old-row (aget ^objects old i)]
-        (dotimes [j dim]
-          (aset new-row j (aget old-row j)))))
-    new))
-
-
 (defn update-water
   [terrain old-water old-energy dim]
-  (loop [new-water (cpy old-water dim)
-         new-energy (cpy old-energy dim)
+  (loop [new-water old-water
+         new-energy old-energy
          c 10]
     (if (> c 0)
       (do (dotimes [i dim]
@@ -120,7 +109,6 @@
       [new-water new-energy])))
 
 
-
 (defn get-water-voxels
   [dim terrain-map water-map stroke-color]
   (flatten (pmap (fn [i]
@@ -132,7 +120,4 @@
                                             (range (aget terrain-row-cur j) (+ (int (aget water-row-cur j)) (aget terrain-row-cur j)))))
                                     (range dim)))))
                  (range dim))))
-;(dotimes [i dim]
-;  (dotimes [j dim]
 
-;@voxels ) )
