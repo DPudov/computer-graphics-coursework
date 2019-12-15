@@ -31,17 +31,44 @@
 (def voxel-neg-z (VoxelNormal. voxel-z -1))
 
 (def voxel-base-count (atom 256))
+(def ^:const dim 50)
+;(defn fill-lookup-table
+;  [voxels]
+;  (->> voxels
+;       (pmap (fn [voxel] [(:x voxel) (:y voxel) (:z voxel)]))
+;       (into [])))
 
 (defn fill-lookup-table
   [voxels]
-  (->> voxels
-       (pmap (fn [voxel] [(:x voxel) (:y voxel) (:z voxel)]))
-       (into [])))
+  (let
+    [lup (make-array Integer/TYPE dim dim dim)]
+    (->> voxels
+         (pmap (fn [voxel]
+                 (let [x (:x voxel)
+                       y (:y voxel)
+                       z (:z voxel)
+                       lup-axis (if (and (>= x 0) (< x dim)) (aget ^objects lup x) nil)
+                       ^ints lup-axis-ordinates (if (and (>= x 0) (< x dim) (>= y 0) (< y dim)) (aget ^objects lup-axis y) nil)]
+                   (if (and (>= x 0) (< x dim) (>= y 0) (< y dim) (>= z 0) (< z dim)) (aset lup-axis-ordinates z (int 1))))))
+
+         (doall))
+    lup))
+
+;(defn in?
+;  "true if coll contains elm"
+;  [coll elm]
+;  (some #(= elm %) coll))
 
 (defn in?
-  "true if coll contains elm"
   [coll elm]
-  (some #(= elm %) coll))
+  (let [x (elm 0)
+        y (elm 1)
+        z (elm 2)
+        lup-axis (if (and (>= x 0) (< x dim)) (aget ^objects coll x) nil)
+        ^ints lup-axis-ordinates (if (and (>= x 0) (< x dim) (>= y 0) (< y dim)) (aget ^objects lup-axis y) nil)]
+    (if (and (>= x 0) (< x dim) (>= y 0) (< y dim) (>= z 0) (< z dim))
+      (not (zero? (aget lup-axis-ordinates z)))
+      false)))
 
 (defn find-exposed-faces
   [voxels lookup-table]
@@ -229,6 +256,5 @@
      faces (pmap combine-faces-single-plane plane-faces)
      triangles (flatten (pmap triangulate-faces-single-plane faces))
      lines nil]
-    ;(time (find-exposed-faces voxels lookup-table))
     ;lines (into [] (pmap outline-faces-single-plane faces))]
     (Mesh. triangles lines)))

@@ -166,6 +166,9 @@
         mvp (camera/model-view-projection-matrix (camera/perspective (:position camera))
                                                  (camera/get-view-matrix camera)
                                                  model-matrix)]
+    (camera/model-view-projection-matrix (camera/perspective (:position camera))
+                                         (camera/get-view-matrix camera)
+                                         model-matrix)
     (voxel/generate-voxel-mesh voxels)
     (draw-mesh canvas mesh mvp)))
 
