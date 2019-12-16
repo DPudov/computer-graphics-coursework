@@ -15,16 +15,16 @@
 
 (defn parabolic-height
   [dim i j]
-  (- (* 0.4 dim) (* 0.02 (+ (* (- i (/ dim 2))
-                               (- i (/ dim 2)))
-                            (* (- j (/ dim 2))
-                               (- j (/ dim 2)))))))
+  (- (* 0.4 dim) (* 0.02 (+ (* (- i (/ dim 2.0))
+                               (- i (/ dim 2.0)))
+                            (* (- j (/ dim 2.0))
+                               (- j (/ dim 2.0)))))))
 
 (defn noised-height
   [dim i j terrain-noise]
-  (* 0.5 dim (+ -0.5 (perlin/noise (/ (* terrain-noise i) dim)
-                                   (/ (* terrain-noise j) dim)
-                                   100))))
+  (* 0.5 dim (+ -0.5 (perlin/noise (/ (* terrain-noise i) (double dim))
+                                   (/ (* terrain-noise j) (double dim))
+                                   100.0))))
 
 (defn calculate-height
   [parabolic noised]
@@ -38,10 +38,11 @@
     (dotimes [i dim]
       (let [^ints terrain-row (aget ^objects terrain i)]
         (dotimes [j dim]
-          (if (not (or (= i 0) (= i (dec dim)) (= j 0) (= j (dec dim))))
-            (aset terrain-row j
-                  (int (calculate-height (parabolic-height dim i j)
-                                         (noised-height dim i j terrain-noise))))
+          (if-not (or (= i 0) (= i (dec dim)) (= j 0) (= j (dec dim)))
+            (do
+              (aset terrain-row j
+                    (int (calculate-height (parabolic-height dim i j)
+                                           (noised-height dim i j terrain-noise)))))
             (aset terrain-row j
                   (int (* 100 dim)))))))
     terrain))
@@ -57,15 +58,15 @@
       (let [^ints terrain-row (aget ^objects terrain-map i)]
         (doseq [j (range 1 (dec dim))]
           (dotimes [k (aget terrain-row j)]
-            (let [hue (int (* 50 (perlin/noise (/ (* hue-noise i) dim)
-                                               (/ (* hue-noise j) dim)
-                                               (/ (* hue-noise k) dim))))
+            (let [hue (int (+ 10 (* 50 (perlin/noise (/ (* hue-noise i) dim)
+                                                     (/ (* hue-noise j) dim)
+                                                     (/ (* hue-noise k) dim)))))
                   saturation (int (+ 50 (* 100 (perlin/noise (+ 1000 (/ (* saturation-noise i) dim))
-                                                            (/ (* saturation-noise j) dim)
-                                                            (/ (* saturation-noise k) dim)))))
+                                                             (/ (* saturation-noise j) dim)
+                                                             (/ (* saturation-noise k) dim)))))
                   brightness 150
                   stroke-color (Color. (hsb-to-rgb hue saturation brightness))]
-             (swap! voxels conj (Voxel. i k j stroke-color)))))))
+              (swap! voxels conj (Voxel. i k j stroke-color)))))))
     @voxels))
 
 (def get-terrain-voxels-memo

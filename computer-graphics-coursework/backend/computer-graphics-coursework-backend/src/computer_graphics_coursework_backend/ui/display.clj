@@ -43,7 +43,7 @@
   "Define menus at menubar"
   (let [a-sketch (action :handler a-sketch
                          :name open
-                         :tip "Выбор анимации..."
+                         :tip "Сохранить GIF..."
                          :key "menu N")
         a-help (action :handler a-help
                        :name help
@@ -87,10 +87,10 @@
                                                     (vertical-panel :items ["oy" (text)])
                                                     (vertical-panel :items ["oz" (text)])])
                           (button :text "Повернуть камеру на N градусов")
-                          (horizontal-panel :items [(vertical-panel :items ["x" (text)])
-                                                    (vertical-panel :items ["y" (text)])
-                                                    (vertical-panel :items ["z" (text)])])
-                          (button :text "Изменить координаты источника света")
+                          ;(horizontal-panel :items [(vertical-panel :items ["x" (text)])
+                          ;                          (vertical-panel :items ["y" (text)])
+                          ;                          (vertical-panel :items ["z" (text)])])
+                          ;(button :text "Изменить координаты источника света")
                           (horizontal-panel :items [(vertical-panel :items ["x" (text)])
                                                     (vertical-panel :items ["y" (text)])
                                                     (vertical-panel :items ["z" (text)])])
@@ -107,8 +107,8 @@
   (frame :id :display
          :title title
          :on-close :exit
-         :width 1300
-         :height 700
+         :width 1920
+         :height 1080
          :content (create-content)
          :minimum-size [640 :by 480]))
 

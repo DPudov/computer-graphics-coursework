@@ -12,9 +12,6 @@
            (java.awt Color Graphics)
            (computer_graphics_coursework_backend.math.matrix Matrix4D)))
 
-(def width 640)
-
-(def height 480)
 (defrecord ClipPlane [p n])
 
 (defrecord Triangle [v1 v2 v3])
@@ -29,13 +26,6 @@
 
 (defn put-pixel [^BufferedImage image-buffer x y ^Color color]
   (.setRGB image-buffer x y (.getRGB color)))
-
-(defn draw-point
-  [^BufferedImage image-buffer point ^Color color]
-  (let [x (int (.getX point))
-        y (int (.getY point))]
-    (if (and (> x 0) (< x width) (> y 0) (< y height))
-      (put-pixel image-buffer x y color))))
 
 (defn draw-line-fast
   [^Graphics g xb yb xe ye ^Color color]
@@ -107,7 +97,7 @@
         points [w1 w2 w3]
         new-points (sutherland-hodgman points clip-planes)]
     (loop [i 2
-           result []]
+           result (transient [])]
       (if (< i (count new-points))
         (let [b1 (barycentric w1 w2 w3 (first new-points))
               b2 (barycentric w1 w2 w3 (new-points (dec i)))
@@ -116,8 +106,8 @@
               v2 (vertex/interpolate-vertices v1 v2 v3 b2)
               v3 (vertex/interpolate-vertices v1 v2 v3 b3)
               new-triangle (Triangle. v1 v2 v3)]
-          (recur (inc i) (conj result new-triangle)))
-        result))))
+          (recur (inc i) (conj! result new-triangle)))
+        (persistent! result)))))
 
 (defn draw-clipped-triangle
   [canvas triangle mvp viewport]

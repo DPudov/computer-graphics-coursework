@@ -140,14 +140,14 @@
 (defn turn-up
   [camera speed delta-time]
   (let [distance (* speed delta-time)
-        pitch-upd (+ (:pitch camera) distance)]
+        pitch-upd (- (:pitch camera) distance)]
     (assoc camera :pitch pitch-upd)))
 
 
 (defn turn-down
   [camera speed delta-time]
   (let [distance (* speed delta-time)
-        pitch-upd (- (:pitch camera) distance)]
+        pitch-upd (+ (:pitch camera) distance)]
     (assoc camera :pitch pitch-upd)))
 
 (defn compute-third-person-camera

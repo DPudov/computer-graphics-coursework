@@ -45,9 +45,16 @@
               water-map @water/water-map
               terrain (terrain/get-terrain-voxels-memo dim)
               water (water/get-water-voxels dim terrain-map water-map Color/BLUE)
-              voxels (vec (concat terrain water))]
+              voxels (vec (concat water terrain))]
+          ;(println "Terrain" (count terrain))
+          (println "Water" (count water))
           (drawer/draw-voxels frame voxels @camera/cam)
           (.drawImage graphics frame nil nil))))
+
+;(defn get-gif
+;  [output-file]
+;  (let []))
+;
 
 (defn generate-world [root]
   (let [^JPanel canvas (select root [:#canvas])
