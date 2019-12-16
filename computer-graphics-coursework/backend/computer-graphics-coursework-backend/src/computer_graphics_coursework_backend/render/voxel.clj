@@ -19,16 +19,25 @@
 (defrecord VoxelFace
   [i0 j0 i1 j1])
 
-(def voxel-x 1)
-(def voxel-y 2)
-(def voxel-z 3)
+(def ^:const voxel-x 1)
+(def ^:const voxel-y 2)
+(def ^:const voxel-z 3)
 
-(def voxel-pos-x (VoxelNormal. voxel-x 1))
-(def voxel-neg-x (VoxelNormal. voxel-x -1))
-(def voxel-pos-y (VoxelNormal. voxel-y 1))
-(def voxel-neg-y (VoxelNormal. voxel-y -1))
-(def voxel-pos-z (VoxelNormal. voxel-z 1))
-(def voxel-neg-z (VoxelNormal. voxel-z -1))
+(def ^:const voxel-pos-x (VoxelNormal. voxel-x 1))
+(def ^:const voxel-neg-x (VoxelNormal. voxel-x -1))
+(def ^:const voxel-pos-y (VoxelNormal. voxel-y 1))
+(def ^:const voxel-neg-y (VoxelNormal. voxel-y -1))
+(def ^:const voxel-pos-z (VoxelNormal. voxel-z 1))
+(def ^:const voxel-neg-z (VoxelNormal. voxel-z -1))
+
+(defn voxel-normal
+  [voxel-normal]
+  (let [axis (:axis voxel-normal)
+        sign (:sign voxel-normal)]
+    (cond
+      (= axis voxel-x) (Vector4D. sign 0 0 1)
+      (= axis voxel-y) (Vector4D. 0 sign 0 1)
+      (= axis voxel-z) (Vector4D. 0 0 sign 1))))
 
 (def voxel-base-count (atom 256))
 (def ^:const dim 50)
@@ -181,11 +190,11 @@
 
 (defn triangle-for-points
   "Generate triangle from points"
-  [p1 p2 p3 c]
+  [p1 p2 p3 c n]
   (triangle/->Triangle
-    (vertex/->Vertex p1 nil nil c nil)
-    (vertex/->Vertex p2 nil nil c nil)
-    (vertex/->Vertex p3 nil nil c nil)))
+    (vertex/->Vertex p1 n nil c nil)
+    (vertex/->Vertex p2 n nil c nil)
+    (vertex/->Vertex p3 n nil c nil)))
 
 
 (defn triangulate-faces-single-plane
@@ -231,11 +240,11 @@
                             (= axis voxel-z)
                             (Vector4D. i0 j1 k 1))]
                    (if (neg? (:sign (:normal plane)))
-                     (let [t1 (triangle-for-points p4 p3 p2 c)
-                           t2 (triangle-for-points p4 p2 p1 c)]
+                     (let [t1 (triangle-for-points p4 p3 p2 c (:normal plane))
+                           t2 (triangle-for-points p4 p2 p1 c (:normal plane))]
                        [t1 t2])
-                     (let [t1 (triangle-for-points p1 p2 p3 c)
-                           t2 (triangle-for-points p1 p3 p4 c)]
+                     (let [t1 (triangle-for-points p1 p2 p3 c (:normal plane))
+                           t2 (triangle-for-points p1 p3 p4 c (:normal plane))]
                        [t1 t2])))))
          (flatten)
          (into []))))

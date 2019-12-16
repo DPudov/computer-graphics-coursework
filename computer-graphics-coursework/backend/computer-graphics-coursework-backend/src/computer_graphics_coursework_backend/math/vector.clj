@@ -439,3 +439,6 @@
         z (v 2)
         w (v 3)]
     (or (< x (- w)) (> x w) (< y (- w)) (> y w) (< z (- w)) (> z w))))
+
+(defn reflect [d n]
+  (sub d (scale (scale n 2) (dot d n))))

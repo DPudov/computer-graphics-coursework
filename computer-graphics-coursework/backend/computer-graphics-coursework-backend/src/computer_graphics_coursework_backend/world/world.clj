@@ -46,7 +46,7 @@
               terrain (terrain/get-terrain-voxels-memo dim)
               water (water/get-water-voxels dim terrain-map water-map Color/BLUE)
               voxels (vec (concat water terrain))]
-          ;(println "Terrain" (count terrain))
+          (println "Camera" @camera/cam)
           (println "Water" (count water))
           (drawer/draw-voxels frame voxels @camera/cam)
           (.drawImage graphics frame nil nil))))

@@ -124,6 +124,28 @@
                     (p3 1) c)))
 
 
+(defn colorize [v1]
+  (let [v1-xyz (:position v1)
+        c (:color v1)
+        r (.getRed c)
+        g (.getGreen c)
+        b (.getBlue c)
+        v1-normal (vec/normalize (voxel/voxel-normal (:normal v1)))
+        light-direction-v1 (vec/normalize (vec/sub @lights/light v1-xyz))
+        view-direction-v1 (vec/normalize (vec/sub v1-xyz))
+        reflect-v1 (vec/reflect (vec/sub light-direction-v1) v1-normal)
+        diffuse-v1 (vec/scale lights/diffuse-albedo (max (vec/dot v1-normal light-direction-v1) 0.0))
+        specular-v1 (vec/scale lights/specular-albedo
+                               (Math/pow (max (vec/dot reflect-v1 view-direction-v1) 0.0) lights/specular-power))
+        modification (vec/add lights/ambient diffuse-v1 specular-v1)]
+    (.getRGB (Color. (int (* r (modification 0)))
+                     (int (* g (modification 1)))
+                     (int (* b (modification 2)))
+                     (int (* 255 (modification 3)))))))
+
+
+
+
 (defn draw-triangles
   [canvas triangles mvp shader]
   (let
@@ -134,9 +156,15 @@
      len (* width height)
      z-buffer (hiphip/amake Double/TYPE [_ len] neg-inf)]
     (doall (pmap (fn [triangle]
-                   (let [p1 (camera/project-to-screen (:position (:v1 triangle)) mvp viewport)
-                         p2 (camera/project-to-screen (:position (:v2 triangle)) mvp viewport)
-                         p3 (camera/project-to-screen (:position (:v3 triangle)) mvp viewport)
+                   (let [v1 (:v1 triangle)
+                         v2 (:v2 triangle)
+                         v3 (:v3 triangle)
+                         c1 (colorize v1)
+                         c2 (colorize v2)
+                         c3 (colorize v3)
+                         p1 (camera/project-to-screen (:position v1) mvp viewport)
+                         p2 (camera/project-to-screen (:position v2) mvp viewport)
+                         p3 (camera/project-to-screen (:position v3) mvp viewport)
                          p1-x (p1 0)
                          p1-y (p1 1)
                          p1-z (p1 2)
@@ -146,12 +174,15 @@
                          p3-x (p3 0)
                          p3-y (p3 1)
                          p3-z (p3 2)
-                         c (.getRGB (:color (:v1 triangle)))
+                         ;c (.getRGB (:color (:v1 triangle)))
+                         ;c (.getRGB (Color. (float (c2 0)) (float (c2 1)) (float (c2 2)) (float (c2 3))))
+                         c c2
                          min-x (int (max 0 (Math/ceil (min p1-x p2-x p3-x))))
                          max-x (int (min (dec width) (Math/floor (max p1-x p2-x p3-x))))
                          min-y (int (max 0 (Math/ceil (min p1-y p2-y p3-y))))
                          max-y (int (min (dec height) (Math/floor (max p1-y p2-y p3-y))))
                          area (+ (* (- p1-y p3-y) (- p2-x p3-x)) (* (- p2-y p3-y) (- p3-x p1-x)))]
+                     ;(println c1)
                      (doall (pmap (fn [y]
                                     (doall
                                       (pmap (fn [x]
@@ -166,7 +197,7 @@
                                                           area)
                                                     depth (+ (* b1 p1-z) (* b2 p2-z) (* b3 p3-z))
                                                     z-index (int (+ (* y width) x))]
-                                                (if (< (aget z-buffer z-index) depth)
+                                                (if (< (aget z-buffer z-index) (+ depth 10e-5))
                                                   (do
                                                     (.setRGB canvas x y c)
                                                     (aset z-buffer z-index depth)))))

@@ -39,6 +39,14 @@
   [projection view model]
   (matr/mult projection view model))
 
+(defn model-view-matrix
+  [view model]
+  (matr/mult view model))
+
+(defn project-to-view-space
+  [point model-view]
+  (matr/transform model-view point))
+
 (defn perspective
   [position]
   (projection-matrix position
@@ -164,4 +172,4 @@
                                    0 0 0 1)]
     (matr/mult rotation-matrix translation)))
 
-(def cam (atom (Camera. @camera-position 0 0 0)))
+(def cam (atom (Camera. @camera-position 40 11 0)))
