@@ -5,7 +5,7 @@
   (:import (computer_graphics_coursework_backend.math.vector Vector4D Vector3D)
            (java.awt.image BufferedImage)
            (java.awt Color)))
-(def camera-position (atom (Vector4D. 0 3 -10 1)))
+(def camera-position (atom (Vector4D. 0 30 -10 1)))
 (def camera-orientation (Vector4D. 0 1 0 1))
 (def eye (Vector4D. 0 0 5 1))
 (def target (atom (Vector4D. 0 0 2 1)))

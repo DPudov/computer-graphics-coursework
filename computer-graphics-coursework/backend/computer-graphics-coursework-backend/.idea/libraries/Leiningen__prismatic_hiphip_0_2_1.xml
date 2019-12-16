@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="Leiningen: prismatic/hiphip:0.2.1">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/prismatic/hiphip/0.2.1/hiphip-0.2.1.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

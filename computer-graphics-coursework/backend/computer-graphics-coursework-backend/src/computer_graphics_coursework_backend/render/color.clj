@@ -50,6 +50,7 @@
 
 (defn scale-color
   [color coef]
-  (let [new-red (* coef (.getRed color))
-        new-green (* coef (.getGreen color))
-        new-blue (* coef (.getBlue color))]))
+  (let [new-red (int (* coef (.getRed color)))
+        new-green (int (* coef (.getGreen color)))
+        new-blue (int (* coef (.getBlue color)))]
+    (Color. new-red new-green new-blue)))

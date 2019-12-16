@@ -57,15 +57,15 @@
       (let [^ints terrain-row (aget ^objects terrain-map i)]
         (doseq [j (range 1 (dec dim))]
           (dotimes [k (aget terrain-row j)]
-            ;(let [hue (int (* 50 (perlin/noise (/ (* hue-noise i) dim)
-            ;                                   (/ (* hue-noise j) dim)
-            ;                                   (/ (* hue-noise k) dim))))
-            ;      saturation (int (+ 50 (* 100 (perlin/noise (+ 1000 (/ (* saturation-noise i) dim))
-            ;                                                (/ (* saturation-noise j) dim)
-            ;                                                (/ (* saturation-noise k) dim)))))
-            ;      brightness 150
-            ;      stroke-color (Color. (hsb-to-rgb hue saturation brightness))]
-              (swap! voxels conj (Voxel. i k j Color/DARK_GRAY))))))
+            (let [hue (int (* 50 (perlin/noise (/ (* hue-noise i) dim)
+                                               (/ (* hue-noise j) dim)
+                                               (/ (* hue-noise k) dim))))
+                  saturation (int (+ 50 (* 100 (perlin/noise (+ 1000 (/ (* saturation-noise i) dim))
+                                                            (/ (* saturation-noise j) dim)
+                                                            (/ (* saturation-noise k) dim)))))
+                  brightness 150
+                  stroke-color (Color. (hsb-to-rgb hue saturation brightness))]
+             (swap! voxels conj (Voxel. i k j stroke-color)))))))
     @voxels))
 
 (def get-terrain-voxels-memo

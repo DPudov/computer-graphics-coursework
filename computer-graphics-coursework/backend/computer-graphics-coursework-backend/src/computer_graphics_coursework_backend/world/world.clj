@@ -38,17 +38,16 @@
     (.clearRect g 0 0 w h)))
 
 (defn paint-frame [canvas ^Graphics2D graphics]
-  (let [w (.getWidth canvas)
-        h (.getHeight canvas)
-        frame (BufferedImage. w h BufferedImage/TYPE_INT_ARGB)
-        terrain-map (terrain/init-terrain-memo dim)
-        water-map @water/water-map
-        terrain (terrain/get-terrain-voxels-memo dim)
-        water (water/get-water-voxels dim terrain-map water-map Color/BLUE)
-        voxels (concat terrain water)]
-    (println (count water) (count terrain))
-    (drawer/draw-voxels frame voxels @camera/cam)
-    (.drawImage graphics frame nil nil)))
+  (time (let [w (.getWidth canvas)
+              h (.getHeight canvas)
+              frame (BufferedImage. w h BufferedImage/TYPE_INT_ARGB)
+              terrain-map (terrain/init-terrain-memo dim)
+              water-map @water/water-map
+              terrain (terrain/get-terrain-voxels-memo dim)
+              water (water/get-water-voxels dim terrain-map water-map Color/BLUE)
+              voxels (vec (concat terrain water))]
+          (drawer/draw-voxels frame voxels @camera/cam)
+          (.drawImage graphics frame nil nil))))
 
 (defn generate-world [root]
   (let [^JPanel canvas (select root [:#canvas])

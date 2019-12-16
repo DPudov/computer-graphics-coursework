@@ -1,7 +1,7 @@
 (ns computer_graphics_coursework_backend.world.water
   (:import (computer_graphics_coursework_backend.render.voxel Voxel)))
 
-(def friction 0.125)
+(def friction 0.3)
 
 (defn init-water-prism
   [length height dim]

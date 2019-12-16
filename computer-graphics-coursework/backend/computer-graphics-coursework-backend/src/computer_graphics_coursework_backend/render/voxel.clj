@@ -240,12 +240,6 @@
          (flatten)
          (into []))))
 
-;
-;(defn outline-faces-single-plane
-;  "Create outside wireframe"
-;  [faces-for-plane])
-
-
 (defn generate-voxel-mesh
   "Generate mesh that surrounds our voxel model"
   [voxels]
@@ -257,6 +251,4 @@
      triangles (flatten (pmap triangulate-faces-single-plane faces))
      lines nil]
 
-    (println (count triangles))
-    ;lines (into [] (pmap outline-faces-single-plane faces))]
     (Mesh. triangles lines)))

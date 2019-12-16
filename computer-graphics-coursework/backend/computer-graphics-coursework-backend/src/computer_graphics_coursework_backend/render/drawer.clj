@@ -4,7 +4,9 @@
             [computer_graphics_coursework_backend.render.camera :as camera]
             [computer_graphics_coursework_backend.render.vertex :as vertex]
             [computer-graphics-coursework-backend.render.shader :as shader]
-            [computer-graphics-coursework-backend.render.lights :as lights])
+            [computer-graphics-coursework-backend.render.lights :as lights]
+            [computer_graphics_coursework_backend.render.color :as color]
+            [hiphip.array :as hiphip])
   (:import java.awt.image.BufferedImage
            (computer_graphics_coursework_backend.math.vector Vector4D)
            (java.awt Color Graphics)
@@ -27,10 +29,6 @@
 
 (defn put-pixel [^BufferedImage image-buffer x y ^Color color]
   (.setRGB image-buffer x y (.getRGB color)))
-
-
-
-
 
 (defn draw-point
   [^BufferedImage image-buffer point ^Color color]
@@ -134,30 +132,57 @@
                     (p3 1) c)
     (draw-line-fast g (p1 0) (p1 1) (p3 0)
                     (p3 1) c)))
-;x1 ((:position))
-;back-face-culling ((:x v1))]))
+
 
 (defn draw-triangles
   [canvas triangles mvp shader]
   (let
-    [viewport [(.getWidth canvas) (.getHeight canvas)]]
+    [viewport [(.getWidth canvas) (.getHeight canvas)]
+     width (viewport 0)
+     height (viewport 1)
+     neg-inf Double/NEGATIVE_INFINITY
+     len (* width height)
+     z-buffer (hiphip/amake Double/TYPE [_ len] neg-inf)]
     (doall (pmap (fn [triangle]
-                   (let [v1 (:v1 triangle)
-                         v2 (:v2 triangle)
-                         v3 (:v3 triangle)]
-                     ;(if (or (vertex/is-outside v1) (vertex/is-outside v2) (vertex/is-outside v3))
-                     ;  (let [triangles (clip-triangle v1 v2 v3)]
-                     ;    (doall (pmap (fn [triangle] (let [p1 (camera/project-to-screen (:position (:v1 triangle)) mvp viewport)
-                     ;                                      p2 (camera/project-to-screen (:position (:v2 triangle)) mvp viewport)
-                     ;                                      p3 (camera/project-to-screen (:position (:v3 triangle)) mvp viewport)
-                     ;                                      c (:color v1)]
-                     ;                                  (draw-line-fast canvas (p1 0) (p1 1) (p2 0)
-                     ;                                                  (p2 1) c)
-                     ;                                  (draw-line-fast canvas (p2 0) (p2 1) (p3 0)
-                     ;                                                  (p3 1) c)
-                     ;                                  (draw-line-fast canvas (p1 0) (p1 1) (p3 0)
-                     ;                                                  (p3 1) c))) triangles)))
-                       (draw-clipped-triangle canvas triangle mvp viewport))) triangles))))
+                   (let [p1 (camera/project-to-screen (:position (:v1 triangle)) mvp viewport)
+                         p2 (camera/project-to-screen (:position (:v2 triangle)) mvp viewport)
+                         p3 (camera/project-to-screen (:position (:v3 triangle)) mvp viewport)
+                         p1-x (p1 0)
+                         p1-y (p1 1)
+                         p1-z (p1 2)
+                         p2-x (p2 0)
+                         p2-y (p2 1)
+                         p2-z (p2 2)
+                         p3-x (p3 0)
+                         p3-y (p3 1)
+                         p3-z (p3 2)
+                         c (.getRGB (:color (:v1 triangle)))
+                         min-x (int (max 0 (Math/ceil (min p1-x p2-x p3-x))))
+                         max-x (int (min (dec width) (Math/floor (max p1-x p2-x p3-x))))
+                         min-y (int (max 0 (Math/ceil (min p1-y p2-y p3-y))))
+                         max-y (int (min (dec height) (Math/floor (max p1-y p2-y p3-y))))
+                         area (+ (* (- p1-y p3-y) (- p2-x p3-x)) (* (- p2-y p3-y) (- p3-x p1-x)))]
+                     (doall (pmap (fn [y]
+                                    (doall
+                                      (pmap (fn [x]
+                                              (let [b1 (/ (+ (* (- y p3-y) (- p2-x p3-x))
+                                                             (* (- p2-y p3-y) (- p3-x x)))
+                                                          area)
+                                                    b2 (/ (+ (* (- y p1-y) (- p3-x p1-x))
+                                                             (* (- p3-y p1-y) (- p1-x x)))
+                                                          area)
+                                                    b3 (/ (+ (* (- y p2-y) (- p1-x p2-x))
+                                                             (* (- p1-y p2-y) (- p2-x x)))
+                                                          area)
+                                                    depth (+ (* b1 p1-z) (* b2 p2-z) (* b3 p3-z))
+                                                    z-index (int (+ (* y width) x))]
+                                                (if (< (aget z-buffer z-index) depth)
+                                                  (do
+                                                    (.setRGB canvas x y c)
+                                                    (aset z-buffer z-index depth)))))
+                                            (range min-x (inc max-x)))))
+                                  (range min-y (inc max-y))))))
+                 triangles))))
 
 (defn draw-mesh [canvas mesh mvp camera-position]
   (let [triangles (:triangles mesh)
@@ -171,10 +196,7 @@
         mvp (camera/model-view-projection-matrix (camera/perspective (:position camera))
                                                  (camera/get-view-matrix camera)
                                                  model-matrix)]
-    (println "Generating mesh...")
-    (time (voxel/generate-voxel-mesh voxels))
-    (println "Drawing mesh to canvas...")
-    (time (draw-mesh canvas mesh mvp (:position camera)))))
+    (draw-mesh canvas mesh mvp (:position camera))))
 
 
 
