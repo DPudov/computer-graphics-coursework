@@ -18,6 +18,12 @@
     <orderEntry type="library" name="Leiningen: com.jgoodies/forms:1.2.1" level="project" />
     <orderEntry type="library" name="Leiningen: com.miglayout/miglayout:3.7.4" level="project" />
     <orderEntry type="library" name="Leiningen: j18n:1.0.2" level="project" />
+    <orderEntry type="library" name="Leiningen: net.mikera/clojure-utils:0.8.0" level="project" />
+    <orderEntry type="library" name="Leiningen: net.mikera/core.matrix:0.62.0" level="project" />
+    <orderEntry type="library" name="Leiningen: net.mikera/mathz:0.3.0" level="project" />
+    <orderEntry type="library" name="Leiningen: net.mikera/randomz:0.3.0" level="project" />
+    <orderEntry type="library" name="Leiningen: net.mikera/vectorz-clj:0.48.0" level="project" />
+    <orderEntry type="library" name="Leiningen: net.mikera/vectorz:0.66.0" level="project" />
     <orderEntry type="library" name="Leiningen: nrepl:0.6.0" level="project" />
     <orderEntry type="library" name="Leiningen: org.apache.commons/commons-math3:3.6.1" level="project" />
     <orderEntry type="library" name="Leiningen: org.clojure/clojure:1.10.0" level="project" />
@@ -29,6 +35,7 @@
     <orderEntry type="library" name="Leiningen: org.clojure/spec.alpha:0.2.176" level="project" />
     <orderEntry type="library" name="Leiningen: org.clojure/tools.analyzer.jvm:0.7.2" level="project" />
     <orderEntry type="library" name="Leiningen: org.clojure/tools.analyzer:0.6.9" level="project" />
+    <orderEntry type="library" name="Leiningen: org.clojure/tools.macro:0.1.5" level="project" />
     <orderEntry type="library" name="Leiningen: org.clojure/tools.reader:1.0.0-beta4" level="project" />
     <orderEntry type="library" name="Leiningen: org.jcuda/jcublas-natives:10.1.0:linux-x86_64" level="project" />
     <orderEntry type="library" name="Leiningen: org.jcuda/jcublas:10.1.0" level="project" />
@@ -51,5 +58,6 @@
     <orderEntry type="library" name="Leiningen: uncomplicate/fluokitten:0.9.1" level="project" />
     <orderEntry type="library" name="Leiningen: uncomplicate/neanderthal-native:0.25.0" level="project" />
     <orderEntry type="library" name="Leiningen: uncomplicate/neanderthal:0.26.1" level="project" />
+    <orderEntry type="library" name="Leiningen: us.bpsm/edn-java:0.4.7" level="project" />
   </component>
 </module>

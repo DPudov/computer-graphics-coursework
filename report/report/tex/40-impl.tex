@@ -69,6 +69,39 @@ Swing предоставляет широкий набор компоненто�
   :profiles {:uberjar {:aot :all}}
   :java-cmd "/usr/lib/jvm/java-1.11.0-openjdk-amd64/bin/java")
 \end{lstlisting}
+
+В листинге \ref{lst:lambert} описана реализация получения цвета по Ламберту.
+
+\begin{lstlisting}[
+                basicstyle={\fontsize{9}{10}\ttfamily},
+                mathescape=true,
+                showstringspaces=false,
+                tabsize=2,
+                flexiblecolumns=true,
+                language={Clojure},
+                label={lst:lambert}
+            ]
+(defn colorize [v1]
+  (let [v1-xyz (:position v1)
+        c (:color v1)
+        r (.getRed c)
+        g (.getGreen c)
+        b (.getBlue c)
+        v1-normal (vec/normalize (voxel/voxel-normal (:normal v1)))
+        light-direction-v1 (vec/normalize (vec/sub @lights/light v1-xyz))
+        view-direction-v1 (vec/normalize (vec/sub v1-xyz))
+        reflect-v1 (vec/reflect (vec/sub light-direction-v1) v1-normal)
+        diffuse-v1 (vec/scale lights/diffuse-albedo (max (vec/dot v1-normal light-direction-v1) 0.0))
+        specular-v1 (vec/scale lights/specular-albedo (Math/pow (max (vec/dot reflect-v1 view-direction-v1) 0.0) lights/specular-power))
+        modification (vec/add lights/ambient diffuse-v1 specular-v1)]
+
+    (+ (bit-shift-left (int (* 255 (modification 3))) 24)
+       (bit-shift-left (int (* r (modification 0))) 16)
+       (bit-shift-left (int (* g (modification 1))) 8)
+       (int (* b (modification 2))))))
+\end{lstlisting}
+
+
 % вывод по разделу
 \section{Вывод}
 

@@ -6,7 +6,8 @@
   :dependencies [[org.clojure/clojure "1.10.0"]
                  [seesaw "1.5.0"]
                  [uncomplicate/neanderthal "0.26.1"]
-                 [prismatic/hiphip "0.2.1"]]
+                 [prismatic/hiphip "0.2.1"]
+                 [net.mikera/vectorz-clj "0.48.0"]]
   :repl-options {:init-ns computer_graphics_coursework_backend.core}
   :main computer_graphics_coursework_backend.core
   :profiles {:uberjar {:aot :all}}
