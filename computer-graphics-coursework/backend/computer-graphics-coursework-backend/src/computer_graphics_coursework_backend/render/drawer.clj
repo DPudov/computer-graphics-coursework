@@ -138,16 +138,15 @@
         specular-v1 (vec/scale lights/specular-albedo
                                (Math/pow (max (vec/dot reflect-v1 view-direction-v1) 0.0) lights/specular-power))
         modification (vec/add lights/ambient diffuse-v1 specular-v1)]
-    (.getRGB (Color. (int (* r (modification 0)))
-                     (int (* g (modification 1)))
-                     (int (* b (modification 2)))
-                     (int (* 255 (modification 3)))))))
 
-
+     (+ (bit-shift-left (int (* 255 (modification 3))) 24)
+        (bit-shift-left (int (* r (modification 0))) 16)
+        (bit-shift-left (int (* g (modification 1))) 8)
+        (int (* b (modification 2))))))
 
 
 (defn draw-triangles
-  [canvas triangles mvp shader]
+  [canvas triangles mvp]
   (let
     [viewport [(.getWidth canvas) (.getHeight canvas)]
      width (viewport 0)
@@ -159,9 +158,6 @@
                    (let [v1 (:v1 triangle)
                          v2 (:v2 triangle)
                          v3 (:v3 triangle)
-                         c1 (colorize v1)
-                         c2 (colorize v2)
-                         c3 (colorize v3)
                          p1 (camera/project-to-screen (:position v1) mvp viewport)
                          p2 (camera/project-to-screen (:position v2) mvp viewport)
                          p3 (camera/project-to-screen (:position v3) mvp viewport)
@@ -174,15 +170,13 @@
                          p3-x (p3 0)
                          p3-y (p3 1)
                          p3-z (p3 2)
-                         ;c (.getRGB (:color (:v1 triangle)))
-                         ;c (.getRGB (Color. (float (c2 0)) (float (c2 1)) (float (c2 2)) (float (c2 3))))
-                         c c2
+                         c (colorize v2)
                          min-x (int (max 0 (Math/ceil (min p1-x p2-x p3-x))))
                          max-x (int (min (dec width) (Math/floor (max p1-x p2-x p3-x))))
                          min-y (int (max 0 (Math/ceil (min p1-y p2-y p3-y))))
                          max-y (int (min (dec height) (Math/floor (max p1-y p2-y p3-y))))
                          area (+ (* (- p1-y p3-y) (- p2-x p3-x)) (* (- p2-y p3-y) (- p3-x p1-x)))]
-                     ;(println c1)
+
                      (doall (pmap (fn [y]
                                     (doall
                                       (pmap (fn [x]
@@ -205,11 +199,9 @@
                                   (range min-y (inc max-y))))))
                  triangles))))
 
-(defn draw-mesh [canvas mesh mvp camera-position]
-  (let [triangles (:triangles mesh)
-        shader (shader/phong-shader mvp @lights/light camera-position)]
-
-    (draw-triangles canvas triangles mvp shader)))
+(defn draw-mesh [canvas mesh mvp]
+  (let [triangles (:triangles mesh)]
+    (draw-triangles canvas triangles mvp)))
 
 (defn draw-voxels
   [^BufferedImage canvas voxels camera]
@@ -217,7 +209,7 @@
         mvp (camera/model-view-projection-matrix (camera/perspective (:position camera))
                                                  (camera/get-view-matrix camera)
                                                  model-matrix)]
-    (draw-mesh canvas mesh mvp (:position camera))))
+    (draw-mesh canvas mesh mvp)))
 
 
 
