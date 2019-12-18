@@ -1,5 +1,5 @@
 (ns computer_graphics_coursework_backend.world.perlin
-  (:require hiphip.array))
+  (:require [fastmath.random :as r]))
 
 (def perlin-mask 255)
 
@@ -38,7 +38,7 @@
 
 (def p-array (into-array Integer/TYPE p))
 
-(defn noise
+(defn standard-noise
   [^double x ^double y ^double z]
   (let [x-floor (Math/floor x)
         y-floor (Math/floor y)
@@ -73,3 +73,7 @@
                 (lerp u
                       (grad (aget p-array (inc AB)) x-relative (dec y-relative) (dec z-relative))
                       (grad (aget p-array (inc BB)) (dec x-relative) (dec y-relative) (dec z-relative)))))))
+
+(defn noise
+  [^double x ^double y ^double z]
+  (r/vnoise x y z))

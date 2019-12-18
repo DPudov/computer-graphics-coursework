@@ -204,7 +204,7 @@
   [faces-for-plane]
   (let [^VoxelPlane plane (first faces-for-plane)
         faces (first (rest faces-for-plane))
-        k (+ (double (:position plane)) (* 0.5 (double (:sign (:normal plane)))))
+        k (+ (float (:position plane)) (* 0.5 (float (:sign (:normal plane)))))
         c (:color plane)
         axis (:axis (:normal plane))]
     (->> faces

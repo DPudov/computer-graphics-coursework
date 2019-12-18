@@ -142,7 +142,7 @@
         reflect-v1 (vec/reflect (m/sub light-direction-v1) v1-normal)
         diffuse-v1 (m/scale lights/diffuse-albedo (max (m/dot v1-normal light-direction-v1) 0.0))
         specular-v1 (m/scale lights/specular-albedo
-                             (Math/pow (max (m/dot reflect-v1 view-direction-v1) 8.0) lights/specular-power))
+                             (Math/pow (max (m/dot reflect-v1 view-direction-v1) 2.0) lights/specular-power))
         modification (m/add lights/ambient diffuse-v1 specular-v1)]
 
     (+ (pmath/bit-shift-left (int (* 255 (m/mget modification 3))) 24)
@@ -155,11 +155,12 @@
   [canvas triangles mvp]
   (let
     [viewport [(.getWidth canvas) (.getHeight canvas)]
-     width (viewport 0)
-     height (viewport 1)
+     width ^long (viewport 0)
+     height ^long (viewport 1)
      neg-inf Double/NEGATIVE_INFINITY
-     len (* width height)
-     z-buffer (hiphip/amake Double/TYPE [_ len] neg-inf)]
+     len ^long (* width height)
+     z-buffer ^doubles (hiphip/amake Double/TYPE [_ len] neg-inf)]
+
     (doall (pmap (fn [^Triangle triangle]
                    (let [v1 ^Vertex (:v1 triangle)
                          v2 ^Vertex (:v2 triangle)
@@ -167,36 +168,36 @@
                          p1 (camera/project-to-screen (:position v1) mvp viewport)
                          p2 (camera/project-to-screen (:position v2) mvp viewport)
                          p3 (camera/project-to-screen (:position v3) mvp viewport)
-                         p1-x (m/mget p1 0)
-                         p1-y (m/mget p1 1)
-                         p1-z (m/mget p1 2)
-                         p2-x (m/mget p2 0)
-                         p2-y (m/mget p2 1)
-                         p2-z (m/mget p2 2)
-                         p3-x (m/mget p3 0)
-                         p3-y (m/mget p3 1)
-                         p3-z (m/mget p3 2)
-                         c (colorize v2)
-                         min-x (int (max 0 (Math/ceil (min p1-x p2-x p3-x))))
-                         max-x (int (min (dec width) (Math/floor (max p1-x p2-x p3-x))))
-                         min-y (int (max 0 (Math/ceil (min p1-y p2-y p3-y))))
-                         max-y (int (min (dec height) (Math/floor (max p1-y p2-y p3-y))))
+                         p1-x ^double (m/mget p1 0)
+                         p1-y ^double (m/mget p1 1)
+                         p1-z ^double (m/mget p1 2)
+                         p2-x ^double (m/mget p2 0)
+                         p2-y ^double (m/mget p2 1)
+                         p2-z ^double (m/mget p2 2)
+                         p3-x ^double (m/mget p3 0)
+                         p3-y ^double (m/mget p3 1)
+                         p3-z ^double (m/mget p3 2)
+                         c ^int (colorize v2)
+                         min-x ^long (long (max 0.0 (Math/ceil (min p1-x p2-x p3-x))))
+                         max-x ^long (long (min (dec width) (Math/floor (max p1-x p2-x p3-x))))
+                         min-y ^long (long (max 0.0 (Math/ceil (min p1-y p2-y p3-y))))
+                         max-y ^long (long (min (dec height) (Math/floor (max p1-y p2-y p3-y))))
                          area ^double (+ (* (- p1-y p3-y) (- p2-x p3-x)) (* (- p2-y p3-y) (- p3-x p1-x)))]
 
                      (doall (p/pmap (fn [^long y]
                                       (doall
                                         (map (fn [^long x]
-                                               (let [b1 (/ (+ (* (- y p3-y) (- p2-x p3-x))
-                                                              (* (- p2-y p3-y) (- p3-x x)))
-                                                           area)
-                                                     b2 (/ (+ (* (- y p1-y) (- p3-x p1-x))
-                                                              (* (- p3-y p1-y) (- p1-x x)))
-                                                           area)
-                                                     b3 (/ (+ (* (- y p2-y) (- p1-x p2-x))
-                                                              (* (- p1-y p2-y) (- p2-x x)))
-                                                           area)
-                                                     depth (+ (* b1 p1-z) (* b2 p2-z) (* b3 p3-z))
-                                                     z-index (int (+ (* y width) x))]
+                                               (let [b1 ^double (/ (+ (* (- y p3-y) (- p2-x p3-x))
+                                                                      (* (- p2-y p3-y) (- p3-x x)))
+                                                                   area)
+                                                     b2 ^double (/ (+ (* (- y p1-y) (- p3-x p1-x))
+                                                                      (* (- p3-y p1-y) (- p1-x x)))
+                                                                   area)
+                                                     b3 ^double (/ (+ (* (- y p2-y) (- p1-x p2-x))
+                                                                      (* (- p1-y p2-y) (- p2-x x)))
+                                                                   area)
+                                                     depth ^double (+ (* b1 p1-z) (* b2 p2-z) (* b3 p3-z))
+                                                     z-index ^long (+ (* y width) x)]
                                                  (if (< (aget z-buffer z-index) (+ depth 10e-5))
                                                    (do
                                                      (.setRGB canvas x y c)
@@ -206,7 +207,7 @@
                  triangles))))
 
 (defn draw-mesh [canvas ^Mesh mesh mvp]
-  (let [triangles (:triangles mesh)]
+  (let [triangles (:triangles mesh)]+ 0.1
     (draw-triangles canvas triangles mvp)))
 
 (defn draw-voxels

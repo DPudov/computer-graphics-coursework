@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="Leiningen: ca.umontreal.iro.simul/ssj:3.3.1">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/ca/umontreal/iro/simul/ssj/3.3.1/ssj-3.3.1.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

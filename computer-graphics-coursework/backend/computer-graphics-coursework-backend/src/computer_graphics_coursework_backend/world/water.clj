@@ -1,53 +1,67 @@
 (ns computer_graphics_coursework_backend.world.water
   (:import (computer_graphics_coursework_backend.render.voxel Voxel)))
 
-(def ^:const friction 0.1)
-(def ^:const flow-div 22.0)
+(def ^:const friction 0.135)
+(def ^:const flow-div 16.0)
 
 (defn init-water-prism
   [length height dim]
   (let [terrain-center (/ dim 2)
         l2 (/ length 2)
-        water (make-array Double/TYPE dim dim)]
+        water (make-array Float/TYPE dim dim)]
     (doseq [i (range (- terrain-center l2) (+ terrain-center l2))
-            :let [^doubles water-row (aget ^objects water i)]]
+            :let [^floats water-row (aget ^objects water i)]]
       (doseq [j (range (- terrain-center l2) (+ terrain-center l2))]
-        (aset water-row j (double height))))
+        (aset water-row j (float height))))
     water))
 
 (defn init-water-energy
   [dim]
-  (make-array Double/TYPE dim dim))
+  (make-array Float/TYPE dim dim))
 
 (def l 10)
-(def h 10)
+(def h 30)
 (def ^:const dim 50)
 
 (def water-map (atom (init-water-prism l h dim)))
 (def energy-map (atom (init-water-energy dim)))
 
+(defn print-water
+  [water energy dim]
+  (println "Water")
+  (dotimes [i dim]
+    (dotimes [j dim]
+      (print (aget water i j) " "))
+    (println))
+  (println "Energy")
+  (dotimes [i dim]
+    (dotimes [j dim]
+      (print (aget energy i j) " "))
+    (println)))
+
 (defn update-water
   [terrain old-water old-energy dim]
+  ;(print-water old-water old-energy dim)
   (loop [new-water old-water
          new-energy old-energy
-         c 10]
+         c 50]
     (if (> c 0)
       (do (dotimes [i dim]
             (let [^ints terrain-row-next (if (< i (dec dim)) (aget ^objects terrain (inc i)) nil)
-                  ^doubles water-row-next (if (< i (dec dim)) (aget ^objects old-water (inc i)) nil)
-                  ^doubles energy-row-next (if (< i (dec dim)) (aget ^objects old-energy (inc i)) nil)
+                  ^floats water-row-next (if (< i (dec dim)) (aget ^objects old-water (inc i)) nil)
+                  ^floats energy-row-next (if (< i (dec dim)) (aget ^objects old-energy (inc i)) nil)
                   ^ints terrain-row-prev (if (> i 0) (aget ^objects terrain (dec i)) nil)
-                  ^doubles water-row-prev (if (> i 0) (aget ^objects old-water (dec i)) nil)
-                  ^doubles energy-row-prev (if (> i 0) (aget ^objects old-energy (dec i)) nil)
+                  ^floats water-row-prev (if (> i 0) (aget ^objects old-water (dec i)) nil)
+                  ^floats energy-row-prev (if (> i 0) (aget ^objects old-energy (dec i)) nil)
                   ^ints terrain-row-cur (aget ^objects terrain i)
-                  ^doubles water-row-cur (aget ^objects old-water i)
-                  ^doubles energy-row-cur (aget ^objects old-energy i)
-                  ^doubles new-energy-row-prev (if (> i 0) (aget ^objects new-energy (dec i)) nil)
-                  ^doubles new-energy-row-cur (aget ^objects new-energy i)
-                  ^doubles new-energy-row-next (if (< i (dec dim)) (aget ^objects new-energy (inc i)) nil)
-                  ^doubles new-water-row-prev (if (> i 0) (aget ^objects new-water (dec i)) nil)
-                  ^doubles new-water-row-cur (aget ^objects new-water i)
-                  ^doubles new-water-row-next (if (< i (dec dim)) (aget ^objects new-water (inc i)) nil)]
+                  ^floats water-row-cur (aget ^objects old-water i)
+                  ^floats energy-row-cur (aget ^objects old-energy i)
+                  ^floats new-energy-row-prev (if (> i 0) (aget ^objects new-energy (dec i)) nil)
+                  ^floats new-energy-row-cur (aget ^objects new-energy i)
+                  ^floats new-energy-row-next (if (< i (dec dim)) (aget ^objects new-energy (inc i)) nil)
+                  ^floats new-water-row-prev (if (> i 0) (aget ^objects new-water (dec i)) nil)
+                  ^floats new-water-row-cur (aget ^objects new-water i)
+                  ^floats new-water-row-next (if (< i (dec dim)) (aget ^objects new-water (inc i)) nil)]
               (dotimes [j dim]
                 (let [left-pressure (if (> i 0)
                                       (+ (aget terrain-row-prev j)
@@ -62,8 +76,8 @@
                       back-pressure (if (> j 0)
                                       (+ (aget terrain-row-cur (dec j))
                                          (aget water-row-cur (dec j))
-                                         (aget energy-row-cur (dec j))
-                                         0.0))
+                                         (aget energy-row-cur (dec j)))
+                                      0.0)
                       front-pressure (if (< j (dec dim))
                                        (+ (aget terrain-row-cur (inc j))
                                           (aget water-row-cur (inc j))
@@ -139,10 +153,12 @@
   (flatten (pmap (fn [i]
                    (let
                      [^ints terrain-row-cur (aget ^objects terrain-map i)
-                      ^doubles water-row-cur (aget ^objects water-map i)]
+                      ^floats water-row-cur (aget ^objects water-map i)]
                      (flatten (map (fn [j]
-                                     (map (fn [k] (Voxel. i k j stroke-color))
-                                          (range (aget terrain-row-cur j) (+ (int (Math/round ^double (aget water-row-cur j))) (aget terrain-row-cur j)))))
-                                   (range dim)))))
-                 (range dim))))
+                                     (map (fn [k]
+                                            (Voxel. i k j stroke-color))
+                                          (range (aget terrain-row-cur j) (+ (int (Math/round ^float (aget water-row-cur j)))
+                                                                             (aget terrain-row-cur j)))))
+                                   (range 1 (dec dim))))))
+                 (range 1 (dec dim)))))
 

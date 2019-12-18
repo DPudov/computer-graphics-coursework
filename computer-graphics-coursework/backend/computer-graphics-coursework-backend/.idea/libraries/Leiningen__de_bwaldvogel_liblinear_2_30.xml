@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="Leiningen: de.bwaldvogel/liblinear:2.30">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/de/bwaldvogel/liblinear/2.30/liblinear-2.30.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
