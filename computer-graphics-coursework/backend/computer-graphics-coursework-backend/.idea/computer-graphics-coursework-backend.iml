@@ -50,6 +50,8 @@
     <orderEntry type="library" name="Leiningen: org.swinglabs.swingx/swingx-core:1.6.3" level="project" />
     <orderEntry type="library" name="Leiningen: org.swinglabs.swingx/swingx-painters:1.6.3" level="project" />
     <orderEntry type="library" name="Leiningen: org.swinglabs.swingx/swingx-plaf:1.6.3" level="project" />
+    <orderEntry type="library" name="Leiningen: parallel:0.10" level="project" />
+    <orderEntry type="library" name="Leiningen: primitive-math:0.1.6" level="project" />
     <orderEntry type="library" name="Leiningen: prismatic/hiphip:0.2.1" level="project" />
     <orderEntry type="library" name="Leiningen: seesaw:1.5.0" level="project" />
     <orderEntry type="library" name="Leiningen: uncomplicate/clojurecl:0.13.0" level="project" />

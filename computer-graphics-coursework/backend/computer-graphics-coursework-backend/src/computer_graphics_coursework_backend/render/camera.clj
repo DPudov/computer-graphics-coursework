@@ -1,12 +1,14 @@
 (ns computer_graphics_coursework_backend.render.camera
   (:require [computer_graphics_coursework_backend.math.matrix :as matr]
-            [computer_graphics_coursework_backend.math.vector :as vec])
+            [computer_graphics_coursework_backend.math.vector :as vec]
+            [clojure.core.matrix :as m])
 
   (:import (computer_graphics_coursework_backend.math.vector Vector4D Vector3D)
            (java.awt.image BufferedImage)
            (java.awt Color)))
-(def camera-position (atom (Vector4D. 0 30 -10 1)))
-(def camera-orientation (Vector4D. 0 1 0 1))
+
+(def camera-position (atom (m/matrix :vectorz [0 30 -10 1])))
+(def camera-orientation (m/matrix :vectorz [0 1 0 1]))
 (def eye (Vector4D. 0 0 5 1))
 (def target (atom (Vector4D. 0 0 2 1)))
 (def up (Vector4D. 0 1 0 1))
@@ -30,22 +32,22 @@
         right (* top aspect-ratio)
         left (- right)]
 
-    (matr/mat4 (/ (* near 2) (- right left)) 0 (/ (+ right left) (- right left)) 0
-               0 (/ (* near 2) (- top bottom)) (/ (+ top bottom) (- top bottom)) 0
-               0 0 (- (/ (+ far near) (- far near))) (- (/ (* 2 far near) (- far near)))
-               0 0 -1 0)))
+    (m/matrix [[(/ (* near 2) (- right left)) 0 (/ (+ right left) (- right left)) 0]
+               [0 (/ (* near 2) (- top bottom)) (/ (+ top bottom) (- top bottom)) 0]
+               [0 0 (- (/ (+ far near) (- far near))) (- (/ (* 2 far near) (- far near)))]
+               [0 0 -1 0]])))
 
 (defn model-view-projection-matrix
   [projection view model]
-  (matr/mult projection view model))
+  (m/mmul projection view model))
 
 (defn model-view-matrix
   [view model]
-  (matr/mult view model))
+  (m/mmul view model))
 
 (defn project-to-view-space
   [point model-view]
-  (matr/transform model-view point))
+  (m/mmul model-view point))
 
 (defn perspective
   [position]
@@ -61,17 +63,17 @@
         x (if (= w 0.0) 0 (/ (v 0) w))
         y (if (= w 0.0) 0 (/ (v 1) w))
         z (if (= w 0.0) 0 (/ (v 2) w))]
-    (Vector4D. x y z w)))
+    (m/matrix :vectorz [x y z w])))
 
 (defn to-screen
   [v viewport]
-  (Vector3D. (+ (/ (* (viewport 0) (v 0)) 2) (/ (viewport 0) 2))
-             (/ (* (viewport 1) (+ (v 1) 1)) 2)
-             (/ (+ (v 2) 1) 2)))
+  (m/matrix :vectorz [(+ (/ (* (viewport 0) (m/mget v 0)) 2) (/ (viewport 0) 2))
+                      (/ (* (viewport 1) (+ (m/mget v 1) 1)) 2)
+                      (/ (+ (m/mget v 2) 1) 2)]))
 
 (defn project-to-screen
   [point model-view-projection view-port]
-  (let [screen-point (perspective-divide (matr/transform model-view-projection point))]
+  (let [screen-point (perspective-divide (m/mmul model-view-projection point))]
     (to-screen screen-point view-port)))
 
 (defprotocol Viewable
@@ -84,19 +86,17 @@
     (let [roll-matrix (matr/rotate-z (- roll))
           pitch-matrix (matr/rotate-x (- pitch))
           yaw-matrix (matr/rotate-y (- yaw))
-          translation (matr/translate-mat4 [(- (position 0))
-                                            (- (position 1))
-                                            (- (position 2))])]
-      (matr/mult roll-matrix pitch-matrix yaw-matrix translation))))
+          translation (matr/translate-mat4 (m/negate position))]
+      (m/mmul roll-matrix pitch-matrix yaw-matrix translation))))
 
 (defn move-forward
   [camera speed delta-time]
   (let [position (:position camera)
         yaw (:yaw camera)
         distance (* speed delta-time)
-        position-x (+ (position 0) (* distance (Math/sin yaw)))
-        position-z (+ (position 2) (* distance (Math/cos yaw)))
-        position-upd (Vector4D. position-x (position 1) position-z 1)]
+        position-x (+ (m/mget position 0) (* distance (Math/sin yaw)))
+        position-z (+ (m/mget position 2) (* distance (Math/cos yaw)))
+        position-upd (m/array :vectorz [position-x (m/mget position 1) position-z 1])]
     (assoc camera :position position-upd)))
 
 
@@ -105,9 +105,9 @@
   (let [position (:position camera)
         yaw (:yaw camera)
         distance (* speed delta-time)
-        position-x (- (position 0) (* distance (Math/sin yaw)))
-        position-z (- (position 2) (* distance (Math/cos yaw)))
-        position-upd (Vector4D. position-x (position 1) position-z 1)]
+        position-x (- (m/mget position 0) (* distance (Math/sin yaw)))
+        position-z (- (m/mget position 2) (* distance (Math/cos yaw)))
+        position-upd (m/array :vectorz [position-x (m/mget position 1) position-z 1])]
     (assoc camera :position position-upd)))
 
 
@@ -116,9 +116,9 @@
   (let [position (:position camera)
         yaw (:yaw camera)
         distance (* speed delta-time)
-        position-x (- (position 0) (* distance (Math/cos yaw)))
-        position-z (- (position 2) (* distance (Math/sin yaw)))
-        position-upd (Vector4D. position-x (position 1) position-z 1)]
+        position-x (- (m/mget position 0) (* distance (Math/cos yaw)))
+        position-z (- (m/mget position 2) (* distance (Math/sin yaw)))
+        position-upd (m/mget m/array :vectorz [position-x (m/mget position 1) position-z 1])]
     (assoc camera :position position-upd)))
 
 
@@ -127,9 +127,9 @@
   (let [position (:position camera)
         yaw (:yaw camera)
         distance (* speed delta-time)
-        position-x (+ (position 0) (* distance (Math/cos yaw)))
-        position-z (+ (position 2) (* distance (Math/sin yaw)))
-        position-upd (Vector4D. position-x (position 1) position-z 1)]
+        position-x (+ (m/mget position 0) (* distance (Math/cos yaw)))
+        position-z (+ (m/mget position 2) (* distance (Math/sin yaw)))
+        position-upd (m/array :vectorz [position-x (m/mget position 1) position-z 1])]
     (assoc camera :position position-upd)))
 
 (defn turn-left
@@ -163,13 +163,13 @@
   (let [translation (matr/translate-mat4 [(- (eye 0))
                                           (- (eye 1))
                                           (- (eye 2))])
-        forward-vec (vec/normalize (vec/sub-4d eye target))
-        left-vec (vec/normalize (vec/cross up forward-vec))
-        up-vec (vec/cross forward-vec left-vec)
-        rotation-matrix (matr/mat4 (left-vec 0) (left-vec 1) (left-vec 2) 0
-                                   (up-vec 0) (up-vec 1) (up-vec 2) 0
-                                   (forward-vec 0) (forward-vec 1) (forward-vec 2) 0
-                                   0 0 0 1)]
-    (matr/mult rotation-matrix translation)))
+        forward-vec (m/normalise (m/sub eye target))
+        left-vec (m/normalise (m/cross up forward-vec))
+        up-vec (m/cross forward-vec left-vec)
+        rotation-matrix (m/matrix :vectorz [[(left-vec 0) (left-vec 1) (left-vec 2) 0]
+                                            [(up-vec 0) (up-vec 1) (up-vec 2) 0]
+                                            [(forward-vec 0) (forward-vec 1) (forward-vec 2) 0]
+                                            [0 0 0 1]])]
+    (m/mmul rotation-matrix translation)))
 
 (def cam (atom (Camera. @camera-position 40 11 0)))

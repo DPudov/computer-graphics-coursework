@@ -1,7 +1,9 @@
 (ns computer_graphics_coursework_backend.render.voxel
   (:require [computer_graphics_coursework_backend.render.mesh :as mesh]
             [computer_graphics_coursework_backend.render.triangle :as triangle]
-            [computer_graphics_coursework_backend.render.vertex :as vertex])
+            [computer_graphics_coursework_backend.render.vertex :as vertex]
+            [clojure.core.matrix :as m]
+            [parallel.core :as p])
   (:import (computer_graphics_coursework_backend.math.vector Vector3D Vector4D)
            (computer_graphics_coursework_backend.render.mesh Mesh)
            (java.util HashMap)
@@ -35,9 +37,9 @@
   (let [axis (:axis voxel-normal)
         sign (:sign voxel-normal)]
     (cond
-      (= axis voxel-x) (Vector4D. sign 0 0 1)
-      (= axis voxel-y) (Vector4D. 0 sign 0 1)
-      (= axis voxel-z) (Vector4D. 0 0 sign 1))))
+      (= axis voxel-x) (m/array :vectorz [sign 0 0 1])
+      (= axis voxel-y) (m/array :vectorz [0 sign 0 1])
+      (= axis voxel-z) (m/array :vectorz [0 0 sign 1]))))
 
 (def voxel-base-count (atom 256))
 (def ^:const dim 50)
@@ -52,13 +54,13 @@
   (let
     [lup (make-array Integer/TYPE dim dim dim)]
     (->> voxels
-         (pmap (fn [voxel]
-                 (let [x (:x voxel)
-                       y (:y voxel)
-                       z (:z voxel)
-                       lup-axis (if (and (>= x 0) (< x dim)) (aget ^objects lup x) nil)
-                       ^ints lup-axis-ordinates (if (and (>= x 0) (< x dim) (>= y 0) (< y dim)) (aget ^objects lup-axis y) nil)]
-                   (if (and (>= x 0) (< x dim) (>= y 0) (< y dim) (>= z 0) (< z dim)) (aset lup-axis-ordinates z (int 1))))))
+         (p/pmap (fn [voxel]
+                   (let [x (:x voxel)
+                         y (:y voxel)
+                         z (:z voxel)
+                         lup-axis (if (and (>= x 0) (< x dim)) (aget ^objects lup x) nil)
+                         ^ints lup-axis-ordinates (if (and (>= x 0) (< x dim) (>= y 0) (< y dim)) (aget ^objects lup-axis y) nil)]
+                     (if (and (>= x 0) (< x dim) (>= y 0) (< y dim) (>= z 0) (< z dim)) (aset lup-axis-ordinates z (int 1))))))
 
          (doall))
     lup))
@@ -82,7 +84,7 @@
 (defn find-exposed-faces
   [voxels lookup-table]
   (let [m (ConcurrentHashMap.)]
-    (doall (map (fn [voxel]
+    (doall (map (fn [^Voxel voxel]
                   (let [x (:x voxel)
                         y (:y voxel)
                         z (:z voxel)
@@ -200,52 +202,52 @@
 (defn triangulate-faces-single-plane
   "Get triangles vector from plane faces"
   [faces-for-plane]
-  (let [plane (first faces-for-plane)
+  (let [^VoxelPlane plane (first faces-for-plane)
         faces (first (rest faces-for-plane))
         k (+ (double (:position plane)) (* 0.5 (double (:sign (:normal plane)))))
         c (:color plane)
         axis (:axis (:normal plane))]
     (->> faces
-         (pmap (fn [face]
-                 (let [i0 (- (:i0 face) 0.5)
-                       j0 (- (:j0 face) 0.5)
-                       i1 (+ (:i1 face) 0.5)
-                       j1 (+ (:j1 face) 0.5)
-                       p1 (cond
-                            (= axis voxel-x)
-                            (Vector4D. k i0 j0 1)
-                            (= axis voxel-y)
-                            (Vector4D. i0 k j1 1)
-                            (= axis voxel-z)
-                            (Vector4D. i0 j0 k 1))
-                       p2 (cond
-                            (= axis voxel-x)
-                            (Vector4D. k i1 j0 1)
-                            (= axis voxel-y)
-                            (Vector4D. i1 k j1 1)
-                            (= axis voxel-z)
-                            (Vector4D. i1 j0 k 1))
-                       p3 (cond
-                            (= axis voxel-x)
-                            (Vector4D. k i1 j1 1)
-                            (= axis voxel-y)
-                            (Vector4D. i1 k j0 1)
-                            (= axis voxel-z)
-                            (Vector4D. i1 j1 k 1))
-                       p4 (cond
-                            (= axis voxel-x)
-                            (Vector4D. k i0 j1 1)
-                            (= axis voxel-y)
-                            (Vector4D. i0 k j0 1)
-                            (= axis voxel-z)
-                            (Vector4D. i0 j1 k 1))]
-                   (if (neg? (:sign (:normal plane)))
-                     (let [t1 (triangle-for-points p4 p3 p2 c (:normal plane))
-                           t2 (triangle-for-points p4 p2 p1 c (:normal plane))]
-                       [t1 t2])
-                     (let [t1 (triangle-for-points p1 p2 p3 c (:normal plane))
-                           t2 (triangle-for-points p1 p3 p4 c (:normal plane))]
-                       [t1 t2])))))
+         (map (fn [^VoxelFace face]
+                (let [i0 (- (:i0 face) 0.5)
+                      j0 (- (:j0 face) 0.5)
+                      i1 (+ (:i1 face) 0.5)
+                      j1 (+ (:j1 face) 0.5)
+                      p1 (cond
+                           (= axis voxel-x)
+                           (m/array :vectorz [k i0 j0 1])
+                           (= axis voxel-y)
+                           (m/array :vectorz [i0 k j1 1])
+                           (= axis voxel-z)
+                           (m/array :vectorz [i0 j0 k 1]))
+                      p2 (cond
+                           (= axis voxel-x)
+                           (m/array :vectorz [k i1 j0 1])
+                           (= axis voxel-y)
+                           (m/array :vectorz [i1 k j1 1])
+                           (= axis voxel-z)
+                           (m/array :vectorz [i1 j0 k 1]))
+                      p3 (cond
+                           (= axis voxel-x)
+                           (m/array :vectorz [k i1 j1 1])
+                           (= axis voxel-y)
+                           (m/array :vectorz [i1 k j0 1])
+                           (= axis voxel-z)
+                           (m/array :vectorz [i1 j1 k 1]))
+                      p4 (cond
+                           (= axis voxel-x)
+                           (m/array :vectorz [k i0 j1 1])
+                           (= axis voxel-y)
+                           (m/array :vectorz [i0 k j0 1])
+                           (= axis voxel-z)
+                           (m/array :vectorz [i0 j1 k 1]))]
+                  (if (neg? (:sign (:normal plane)))
+                    (let [t1 (triangle-for-points p4 p3 p2 c (:normal plane))
+                          t2 (triangle-for-points p4 p2 p1 c (:normal plane))]
+                      [t1 t2])
+                    (let [t1 (triangle-for-points p1 p2 p3 c (:normal plane))
+                          t2 (triangle-for-points p1 p3 p4 c (:normal plane))]
+                      [t1 t2])))))
          (flatten)
          (into []))))
 

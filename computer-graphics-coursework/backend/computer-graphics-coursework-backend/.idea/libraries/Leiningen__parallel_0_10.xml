@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="Leiningen: parallel:0.10">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/parallel/parallel/0.10/parallel-0.10.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

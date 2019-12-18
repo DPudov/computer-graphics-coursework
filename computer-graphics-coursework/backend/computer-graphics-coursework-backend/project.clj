@@ -7,10 +7,13 @@
                  [seesaw "1.5.0"]
                  [uncomplicate/neanderthal "0.26.1"]
                  [prismatic/hiphip "0.2.1"]
-                 [net.mikera/vectorz-clj "0.48.0"]]
+                 [net.mikera/vectorz-clj "0.48.0"]
+                 [parallel "0.10"]
+                 [primitive-math "0.1.6"]]
   :repl-options {:init-ns computer_graphics_coursework_backend.core}
   :main computer_graphics_coursework_backend.core
   :profiles {:uberjar {:aot :all}}
   :java-cmd "/usr/lib/jvm/java-1.11.0-openjdk-amd64/bin/java"
-  :jvm-opts "--add-opens=java.base/jdk.internal.ref=ALL-UNNAMED")
+  :jvm-opts "--add-opens=java.base/jdk.internal.ref=ALL-UNNAMED"
+  :global-vars {*warn-on-reflection* true})
 

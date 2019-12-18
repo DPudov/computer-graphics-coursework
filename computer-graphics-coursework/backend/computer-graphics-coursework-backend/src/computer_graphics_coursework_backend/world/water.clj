@@ -60,10 +60,10 @@
                                           (- (aget energy-row-next j)))
                                        0.0)
                       back-pressure (if (> j 0)
-                                     (+ (aget terrain-row-cur (dec j))
-                                        (aget water-row-cur (dec j))
-                                        (aget energy-row-cur (dec j))
-                                      0.0))
+                                      (+ (aget terrain-row-cur (dec j))
+                                         (aget water-row-cur (dec j))
+                                         (aget energy-row-cur (dec j))
+                                         0.0))
                       front-pressure (if (< j (dec dim))
                                        (+ (aget terrain-row-cur (inc j))
                                           (aget water-row-cur (inc j))
@@ -140,9 +140,9 @@
                    (let
                      [^ints terrain-row-cur (aget ^objects terrain-map i)
                       ^doubles water-row-cur (aget ^objects water-map i)]
-                     (flatten (pmap (fn [j]
-                                      (pmap (fn [k] (Voxel. i k j stroke-color))
-                                            (range (aget terrain-row-cur j) (+ (int (Math/round ^double (aget water-row-cur j))) (aget terrain-row-cur j)))))
-                                    (range dim)))))
+                     (flatten (map (fn [j]
+                                     (map (fn [k] (Voxel. i k j stroke-color))
+                                          (range (aget terrain-row-cur j) (+ (int (Math/round ^double (aget water-row-cur j))) (aget terrain-row-cur j)))))
+                                   (range dim)))))
                  (range dim))))
 

@@ -1,5 +1,6 @@
 (ns computer_graphics_coursework_backend.math.matrix
-  (:require [computer_graphics_coursework_backend.math.vector :as vec])
+  (:require [computer_graphics_coursework_backend.math.vector :as vec]
+            [clojure.core.matrix :as m])
   (:import (computer_graphics_coursework_backend.math.vector Vector2D Vector3D Vector4D)
            (java.io Writer)
            (clojure.lang MapEntry IFn ILookup Associative Counted Sequential Seqable)))
@@ -548,12 +549,12 @@
    (let [angle (Math/toRadians angle)
          cosine (Math/cos angle)
          sine (Math/sin angle)]
-     (Matrix4D. 1.0 0.0 0.0 0.0
-                0.0 cosine (- sine) 0.0
-                0.0 sine cosine 0.0
-                0.0 0.0 0.0 1.0)))
+     (m/matrix :vectorz [[1.0 0.0 0.0 0.0]
+                         [0.0 cosine (- sine) 0.0]
+                         [0.0 sine cosine 0.0]
+                         [0.0 0.0 0.0 1.0]])))
   ([mat angle]
-   (mult mat (rotate-x angle))))
+   (m/mmul mat (rotate-x angle))))
 
 (defn rotate-y
   "Returns a rotation matrix for the given angle."
@@ -561,12 +562,12 @@
    (let [angle (Math/toRadians angle)
          cosine (Math/cos angle)
          sine (Math/sin angle)]
-     (Matrix4D. cosine 0.0 sine 0.0
-                0.0 1.0 0.0 0.0
-                (- sine) 0.0 cosine 0.0
-                0.0 0.0 0.0 1.0)))
+     (m/matrix :vectorz [[cosine 0.0 sine 0.0]
+                         [0.0 1.0 0.0 0.0]
+                         [(- sine) 0.0 cosine 0.0]
+                         [0.0 0.0 0.0 1.0]])))
   ([mat angle]
-   (mult mat (rotate-y angle))))
+   (m/mmul mat (rotate-y angle))))
 
 (defn rotate-z
   "Returns a rotation matrix for the given angle."
@@ -574,12 +575,12 @@
    (let [angle (Math/toRadians angle)
          cosine (Math/cos angle)
          sine (Math/sin angle)]
-     (Matrix4D. cosine (- sine) 0.0 0.0
-                sine cosine 0.0 0.0
-                0.0 0.0 1.0 0.0
-                0.0 0.0 0.0 1.0)))
+     (m/matrix :vectorz [[cosine (- sine) 0.0 0.0]
+                         [sine cosine 0.0 0.0]
+                         [0.0 0.0 1.0 0.0]
+                         [0.0 0.0 0.0 1.0]])))
   ([mat angle]
-   (mult mat (rotate-z angle))))
+   (m/mmul mat (rotate-z angle))))
 
 (defn rotate
   "Rotate a matrix given an angle and axis of rotation."
@@ -700,14 +701,14 @@
 
 (defn translate-mat4
   [v]
-  (Matrix4D. 1 0 0 (v 0)
-             0 1 0 (v 1)
-             0 0 1 (v 2)
-             0 0 0 1))
+  (m/matrix :vectorz [[1 0 0 (m/mget v 0)]
+                      [0 1 0 (m/mget v 1)]
+                      [0 0 1 (m/mget v 2)]
+                      [0 0 0 1]]))
 
 (defn scale-mat4
   [v]
-  (Matrix4D. (v 0) 0 0 0
+  (Matrix4D. (m/mget v 0) 0 0 0
              0 (v 1) 0 0
              0 0 (v 2) 0
              0 0 0 1))

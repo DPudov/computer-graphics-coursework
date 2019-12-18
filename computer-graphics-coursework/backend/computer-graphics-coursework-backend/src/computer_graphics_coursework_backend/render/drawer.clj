@@ -6,23 +6,29 @@
             [computer-graphics-coursework-backend.render.shader :as shader]
             [computer-graphics-coursework-backend.render.lights :as lights]
             [computer_graphics_coursework_backend.render.color :as color]
-            [hiphip.array :as hiphip])
-  (:import java.awt.image.BufferedImage
-           (computer_graphics_coursework_backend.math.vector Vector4D)
-           (java.awt Color Graphics)
-           (computer_graphics_coursework_backend.math.matrix Matrix4D)))
+            [hiphip.array :as hiphip]
+            [clojure.core.matrix :as m]
+            [parallel.core :as p]
+            [primitive-math :as pmath])
 
+  (:import java.awt.image.BufferedImage
+           (java.awt Color Graphics)
+           (computer_graphics_coursework_backend.render.mesh Mesh)
+           (computer_graphics_coursework_backend.render.camera Camera)
+           (computer_graphics_coursework_backend.render.vertex Vertex)
+           (computer_graphics_coursework_backend.math.vector Vector)
+           (mikera.vectorz Vector3)))
 (defrecord ClipPlane [p n])
 
 (defrecord Triangle [v1 v2 v3])
 
 (def clip-planes
-  [(ClipPlane. (Vector4D. 1 0 0 1) (Vector4D. -1 0 0 1))
-   (ClipPlane. (Vector4D. -1 0 0 1) (Vector4D. 1 0 0 1))
-   (ClipPlane. (Vector4D. 0 1 0 1) (Vector4D. 0 -1 0 1))
-   (ClipPlane. (Vector4D. 0 -1 0 1) (Vector4D. 0 1 0 1))
-   (ClipPlane. (Vector4D. 0 0 1 1) (Vector4D. 0 0 -1 1))
-   (ClipPlane. (Vector4D. 0 0 -1 1) (Vector4D. 0 0 1 1))])
+  [(ClipPlane. (m/matrix :vectorz [1 0 0 1]) (m/matrix :vectorz [-1 0 0 1]))
+   (ClipPlane. (m/matrix :vectorz [-1 0 0 1]) (m/matrix :vectorz [1 0 0 1]))
+   (ClipPlane. (m/matrix :vectorz [0 1 0 1]) (m/matrix :vectorz [0 -1 0 1]))
+   (ClipPlane. (m/matrix :vectorz [0 -1 0 1]) (m/matrix :vectorz [0 1 0 1]))
+   (ClipPlane. (m/matrix :vectorz [0 0 1 1]) (m/matrix :vectorz [0 0 -1 1]))
+   (ClipPlane. (m/matrix :vectorz [0 0 -1 1]) (m/matrix :vectorz [0 0 1 1]))])
 
 (defn put-pixel [^BufferedImage image-buffer x y ^Color color]
   (.setRGB image-buffer x y (.getRGB color)))
@@ -33,22 +39,22 @@
   (.drawLine g xb yb xe ye))
 
 (def model-matrix
-  (Matrix4D. 1.0 0.0 0.0 0.0
-             0.0 1.0 0.0 0.0
-             0.0 0.0 1.0 0.0
-             0.0 0.0 0.0 1.0))
+  (m/matrix :vectorz [[1.0 0.0 0.0 0.0]
+                      [0.0 1.0 0.0 0.0]
+                      [0.0 0.0 1.0 0.0]
+                      [0.0 0.0 0.0 1.0]]))
 
 (defn point-in-front
   [plane point]
-  (pos? (vec/dot (vec/sub point (:p plane)) (:n plane))))
+  (pos? (m/dot (m/sub point (:p plane)) (:n plane))))
 
 (defn intersect-segment
   [plane v0 v1]
-  (let [u (vec/sub v1 v0)
-        w (vec/sub v0 (:p plane))
-        d (vec/dot (:n plane) u)
-        n (vec/dot (vec/sub (:n plane)) w)]
-    (vec/add v0 (vec/scale u (/ n d)))))
+  (let [u (m/sub v1 v0)
+        w (m/sub v0 (:p plane))
+        d (m/dot (:n plane) u)
+        n (m/dot (m/sub (:n plane)) w)]
+    (m/add v0 (m/scale u (/ n d)))))
 
 (defn sutherland-hodgman
   "Sutherland-Hodgman clipping algorithm"
@@ -76,19 +82,19 @@
 
 (defn barycentric
   [p1 p2 p3 p]
-  (let [v0 (vec/sub-3d p2 p1)
-        v1 (vec/sub-3d p3 p1)
-        v2 (vec/sub-3d p p1)
-        d00 (vec/dot-3d v0 v0)
-        d01 (vec/dot-3d v0 v1)
-        d11 (vec/dot-3d v1 v1)
-        d20 (vec/dot-3d v2 v0)
-        d21 (vec/dot-3d v2 v1)
+  (let [v0 (m/sub p2 p1)
+        v1 (m/sub p3 p1)
+        v2 (m/sub p p1)
+        d00 (m/dot v0 v0)
+        d01 (m/dot v0 v1)
+        d11 (m/dot v1 v1)
+        d20 (m/dot v2 v0)
+        d21 (m/dot v2 v1)
         d (- (* d00 d11) (* d01 d01))
         v (/ (- (* d11 d20) (* d01 d21)) d)
         w (/ (- (* d00 d21) (* d01 d20)) d)
-        u (- 1 v w)]
-    (Vector4D. u v w 1)))
+        u (- 1.0 v w)]
+    (m/matrix :vectorz [u v w 1])))
 
 (defn clip-triangle [v1 v2 v3]
   (let [w1 (:position v1)
@@ -124,25 +130,25 @@
                     (p3 1) c)))
 
 
-(defn colorize [v1]
+(defn colorize [^Vertex v1]
   (let [v1-xyz (:position v1)
         c (:color v1)
         r (.getRed c)
         g (.getGreen c)
         b (.getBlue c)
-        v1-normal (vec/normalize (voxel/voxel-normal (:normal v1)))
-        light-direction-v1 (vec/normalize (vec/sub @lights/light v1-xyz))
-        view-direction-v1 (vec/normalize (vec/sub v1-xyz))
-        reflect-v1 (vec/reflect (vec/sub light-direction-v1) v1-normal)
-        diffuse-v1 (vec/scale lights/diffuse-albedo (max (vec/dot v1-normal light-direction-v1) 0.0))
-        specular-v1 (vec/scale lights/specular-albedo
-                               (Math/pow (max (vec/dot reflect-v1 view-direction-v1) 0.0) lights/specular-power))
-        modification (vec/add lights/ambient diffuse-v1 specular-v1)]
+        v1-normal (m/normalise (voxel/voxel-normal (:normal v1)))
+        light-direction-v1 (m/normalise (m/sub @lights/light v1-xyz))
+        view-direction-v1 (m/normalise (m/sub v1-xyz))
+        reflect-v1 (vec/reflect (m/sub light-direction-v1) v1-normal)
+        diffuse-v1 (m/scale lights/diffuse-albedo (max (m/dot v1-normal light-direction-v1) 0.0))
+        specular-v1 (m/scale lights/specular-albedo
+                             (Math/pow (max (m/dot reflect-v1 view-direction-v1) 8.0) lights/specular-power))
+        modification (m/add lights/ambient diffuse-v1 specular-v1)]
 
-     (+ (bit-shift-left (int (* 255 (modification 3))) 24)
-        (bit-shift-left (int (* r (modification 0))) 16)
-        (bit-shift-left (int (* g (modification 1))) 8)
-        (int (* b (modification 2))))))
+    (+ (pmath/bit-shift-left (int (* 255 (m/mget modification 3))) 24)
+       (pmath/bit-shift-left (int (* r (m/mget modification 0))) 16)
+       (pmath/bit-shift-left (int (* g (m/mget modification 1))) 8)
+       (int (* b (m/mget modification 2))))))
 
 
 (defn draw-triangles
@@ -154,57 +160,57 @@
      neg-inf Double/NEGATIVE_INFINITY
      len (* width height)
      z-buffer (hiphip/amake Double/TYPE [_ len] neg-inf)]
-    (doall (pmap (fn [triangle]
-                   (let [v1 (:v1 triangle)
-                         v2 (:v2 triangle)
-                         v3 (:v3 triangle)
+    (doall (pmap (fn [^Triangle triangle]
+                   (let [v1 ^Vertex (:v1 triangle)
+                         v2 ^Vertex (:v2 triangle)
+                         v3 ^Vertex (:v3 triangle)
                          p1 (camera/project-to-screen (:position v1) mvp viewport)
                          p2 (camera/project-to-screen (:position v2) mvp viewport)
                          p3 (camera/project-to-screen (:position v3) mvp viewport)
-                         p1-x (p1 0)
-                         p1-y (p1 1)
-                         p1-z (p1 2)
-                         p2-x (p2 0)
-                         p2-y (p2 1)
-                         p2-z (p2 2)
-                         p3-x (p3 0)
-                         p3-y (p3 1)
-                         p3-z (p3 2)
+                         p1-x (m/mget p1 0)
+                         p1-y (m/mget p1 1)
+                         p1-z (m/mget p1 2)
+                         p2-x (m/mget p2 0)
+                         p2-y (m/mget p2 1)
+                         p2-z (m/mget p2 2)
+                         p3-x (m/mget p3 0)
+                         p3-y (m/mget p3 1)
+                         p3-z (m/mget p3 2)
                          c (colorize v2)
                          min-x (int (max 0 (Math/ceil (min p1-x p2-x p3-x))))
                          max-x (int (min (dec width) (Math/floor (max p1-x p2-x p3-x))))
                          min-y (int (max 0 (Math/ceil (min p1-y p2-y p3-y))))
                          max-y (int (min (dec height) (Math/floor (max p1-y p2-y p3-y))))
-                         area (+ (* (- p1-y p3-y) (- p2-x p3-x)) (* (- p2-y p3-y) (- p3-x p1-x)))]
+                         area ^double (+ (* (- p1-y p3-y) (- p2-x p3-x)) (* (- p2-y p3-y) (- p3-x p1-x)))]
 
-                     (doall (pmap (fn [y]
-                                    (doall
-                                      (pmap (fn [x]
-                                              (let [b1 (/ (+ (* (- y p3-y) (- p2-x p3-x))
-                                                             (* (- p2-y p3-y) (- p3-x x)))
-                                                          area)
-                                                    b2 (/ (+ (* (- y p1-y) (- p3-x p1-x))
-                                                             (* (- p3-y p1-y) (- p1-x x)))
-                                                          area)
-                                                    b3 (/ (+ (* (- y p2-y) (- p1-x p2-x))
-                                                             (* (- p1-y p2-y) (- p2-x x)))
-                                                          area)
-                                                    depth (+ (* b1 p1-z) (* b2 p2-z) (* b3 p3-z))
-                                                    z-index (int (+ (* y width) x))]
-                                                (if (< (aget z-buffer z-index) (+ depth 10e-5))
-                                                  (do
-                                                    (.setRGB canvas x y c)
-                                                    (aset z-buffer z-index depth)))))
-                                            (range min-x (inc max-x)))))
-                                  (range min-y (inc max-y))))))
+                     (doall (p/pmap (fn [^long y]
+                                      (doall
+                                        (map (fn [^long x]
+                                               (let [b1 (/ (+ (* (- y p3-y) (- p2-x p3-x))
+                                                              (* (- p2-y p3-y) (- p3-x x)))
+                                                           area)
+                                                     b2 (/ (+ (* (- y p1-y) (- p3-x p1-x))
+                                                              (* (- p3-y p1-y) (- p1-x x)))
+                                                           area)
+                                                     b3 (/ (+ (* (- y p2-y) (- p1-x p2-x))
+                                                              (* (- p1-y p2-y) (- p2-x x)))
+                                                           area)
+                                                     depth (+ (* b1 p1-z) (* b2 p2-z) (* b3 p3-z))
+                                                     z-index (int (+ (* y width) x))]
+                                                 (if (< (aget z-buffer z-index) (+ depth 10e-5))
+                                                   (do
+                                                     (.setRGB canvas x y c)
+                                                     (aset z-buffer z-index depth)))))
+                                             (range min-x (inc max-x)))))
+                                    (range min-y (inc max-y))))))
                  triangles))))
 
-(defn draw-mesh [canvas mesh mvp]
+(defn draw-mesh [canvas ^Mesh mesh mvp]
   (let [triangles (:triangles mesh)]
     (draw-triangles canvas triangles mvp)))
 
 (defn draw-voxels
-  [^BufferedImage canvas voxels camera]
+  [^BufferedImage canvas voxels ^Camera camera]
   (let [mesh (voxel/generate-voxel-mesh voxels)
         mvp (camera/model-view-projection-matrix (camera/perspective (:position camera))
                                                  (camera/get-view-matrix camera)

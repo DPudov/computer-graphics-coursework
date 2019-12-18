@@ -1,4 +1,5 @@
 (ns computer_graphics_coursework_backend.math.vector
+  (:require [clojure.core.matrix :as m])
   (:import (clojure.lang Counted Sequential Associative MapEntry Seqable ILookup IFn)
            (java.io Writer)))
 
@@ -441,4 +442,4 @@
     (or (< x (- w)) (> x w) (< y (- w)) (> y w) (< z (- w)) (> z w))))
 
 (defn reflect [d n]
-  (sub d (scale (scale n 2) (dot d n))))
+  (m/sub d (m/scale (m/scale n 2) (m/dot d n))))
