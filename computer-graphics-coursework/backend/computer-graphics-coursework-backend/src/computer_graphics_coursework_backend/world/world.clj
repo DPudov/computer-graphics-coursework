@@ -5,19 +5,18 @@
   (:require [computer_graphics_coursework_backend.render.camera :as camera]
             [computer_graphics_coursework_backend.render.drawer :as drawer]
             [computer_graphics_coursework_backend.world.terrain :as terrain]
-            [computer_graphics_coursework_backend.world.water :as water])
+            [computer_graphics_coursework_backend.world.water :as water]
+            [computer-graphics-coursework-backend.world.config :as conf])
   (:import (java.awt.image BufferedImage)
            (java.awt Color Graphics2D)
            (javax.swing Timer JPanel)
            (java.awt.event ActionListener KeyEvent)))
 
-(def desired-fps 30)
+(def desired-fps 1)
 
 (defn time-ms-by-fps
   [fps]
   (/ 1000 fps))
-
-(def dim 50)
 
 (defn create-timer
   [tick-time canvas]
@@ -25,7 +24,7 @@
     (Timer. tick-time (reify ActionListener
                         (actionPerformed [this e]
                           (let [[new-water new-energy]
-                                (water/update-water (terrain/init-terrain-memo dim) @water/water-map @water/energy-map dim)]
+                                (water/update-water (terrain/init-terrain-memo conf/dim) @water/water-map @water/energy-map conf/dim)]
                             (reset! water/water-map new-water)
                             (reset! water/energy-map new-energy))
                           (.repaint canvas))))))
@@ -41,20 +40,15 @@
   (time (let [w (.getWidth canvas)
               h (.getHeight canvas)
               frame (BufferedImage. w h BufferedImage/TYPE_INT_ARGB)
-              terrain-map (terrain/init-terrain-memo dim)
+              terrain-map (terrain/init-terrain-memo conf/dim)
               water-map @water/water-map
-              terrain (terrain/get-terrain-voxels-memo dim)
-              water (water/get-water-voxels dim terrain-map water-map Color/BLUE)
+              terrain (terrain/get-terrain-voxels-memo conf/dim)
+              water (water/get-water-voxels conf/dim terrain-map water-map Color/BLUE)
               voxels (vec (concat water terrain))]
           (println "Camera" @camera/cam)
           (println "Water" (count water) "Terrain" (count terrain))
           (drawer/draw-voxels frame voxels @camera/cam)
           (.drawImage graphics frame nil nil))))
-
-;(defn get-gif
-;  [output-file]
-;  (let []))
-;
 
 (defn generate-world [root]
   (let [^JPanel canvas (select root [:#canvas])

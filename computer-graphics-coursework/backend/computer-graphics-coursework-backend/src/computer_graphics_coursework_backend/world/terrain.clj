@@ -44,7 +44,7 @@
                     (int (calculate-height (parabolic-height dim i j)
                                            (noised-height dim i j terrain-noise)))))
             (aset terrain-row j
-                  (int (* 1000 dim)))))))
+                  (int (* 100 dim)))))))
     terrain))
 
 (def init-terrain-memo

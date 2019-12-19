@@ -7,7 +7,7 @@
            (java.awt.image BufferedImage)
            (java.awt Color)))
 
-(def camera-position (atom (m/matrix :vectorz [0 30 -10 1])))
+(def camera-position (atom (m/matrix :vectorz [0 100 -30 1])))
 (def camera-orientation (m/matrix :vectorz [0 1 0 1]))
 (def eye (Vector4D. 0 0 5 1))
 (def target (atom (Vector4D. 0 0 2 1)))
@@ -172,4 +172,4 @@
                                             [0 0 0 1]])]
     (m/mmul rotation-matrix translation)))
 
-(def cam (atom (Camera. @camera-position 40 11 0)))
+(def cam (atom (Camera. @camera-position 40 40 0)))
