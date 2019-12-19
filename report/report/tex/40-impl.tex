@@ -12,13 +12,6 @@
 \section{Требования к программному обеспечению}
 
 Разработанное ПО должно моделировать движение воды с использованием вокселов.
-%
-% Пользователь должен иметь возможность изменять степень детализации,
-% источники освещения, выбирать вид отображения воды:
-% \begin{itemize}
-%     \item волны;
-%     \item спокойное течение.
-% \end{itemize}
 
 Моделирование движения должно осуществляться с использованием операций переноса, масштабирования и поворота.
 
@@ -42,11 +35,27 @@ Swing предоставляет широкий набор компоненто�
 
 Для организации проекта на Clojure и для автоматизации сборки используется Leiningen.
 Все конфигурации для сборки приложения, запуска REPL и описания зависимостей управляются с помощью
-этого модуля\cite{site:lein}.
+этого модуля\cite{site:lein}. Результатом сборки является JAR файл, который можно запустить
+на любом компьютере, где установлено соответствующее JRE.
+
+Для оптимизации работы алгоритмов рендеринга использованы подсказки типа - механизм
+языка Clojure, позволяющий избежать рефлексивного обращения к JVM. Также используются
+средства параллельной обработки ленивых последовательностей Clojure - "pmap".
+
+Для оптимизации хранения некоторых воксельных структур использована мемоизация -
+механизм Clojure, который позволяет запоминать результаты выполнения функций.
 
 \section{Листинги кода}
 
-В листинге \ref{lst:config} указана конфигурация сборки проекта на языке Clojure.
+В данном разделе будут представлены листинги реализации наиболее существенных
+модулей программы.
+
+\subsection{Клеточный автомат}
+
+В данном подразделе указан листинг кода, относящийся к реализации клеточного автомата
+симуляции воды.
+
+В листинге \ref{lst:cellular} представлена реализация обновления состояния клеточного автомата.
 
 \begin{lstlisting}[
                 basicstyle={\fontsize{9}{10}\ttfamily},
@@ -55,19 +64,200 @@ Swing предоставляет широкий набор компоненто�
                 tabsize=2,
                 flexiblecolumns=true,
                 language={Clojure},
-                label={lst:config}
+                label={lst:cellular}
             ]
-(defproject computer-graphics-coursework-backend "0.1.0-SNAPSHOT"
-  :description "Pudov's computer graphics coursework"
-  :url "https://github.com/DPudov"
-  :license {:name "Eclipse Public License"
-            :url  "http://www.eclipse.org/legal/epl-v10.html"}
-  :dependencies [[org.clojure/clojure "1.10.0"]
-                 [seesaw "1.5.0"]]
-  :repl-options {:init-ns computer_graphics_coursework_backend.core}
-  :main computer_graphics_coursework_backend.core
-  :profiles {:uberjar {:aot :all}}
-  :java-cmd "/usr/lib/jvm/java-1.11.0-openjdk-amd64/bin/java")
+(let [left-pressure (if (> i 0)
+                                (+ (aget terrain-row-prev j)
+                                   (aget water-row-prev j)
+                                   (aget energy-row-prev j))
+                                0.0)
+                right-pressure (if (< i (dec dim))
+                                 (+ (aget terrain-row-next j)
+                                    (aget water-row-next j)
+                                    (- (aget energy-row-next j)))
+                                 0.0)
+                back-pressure (if (> j 0)
+                                (+ (aget terrain-row-cur (dec j))
+                                   (aget water-row-cur (dec j))
+                                   (aget energy-row-cur (dec j)))
+                                0.0)
+                front-pressure (if (< j (dec dim))
+                                 (+ (aget terrain-row-cur (inc j))
+                                    (aget water-row-cur (inc j))
+                                    (- (aget energy-row-cur (inc j))))
+                                 0.0)]
+            (if (and (> i 0)
+                     (> (+ (aget terrain-row-cur j)
+                           (aget water-row-cur j)
+                           (aget energy-row-cur j))
+                        left-pressure))
+              (let [flow (/ (min (aget water-row-cur j)
+                                 (+ (aget terrain-row-cur j)
+                                    (aget water-row-cur j)
+                                    (- (aget energy-row-cur j))
+                                    (- left-pressure)))
+                            flow-div)]
+                (aset water-row-prev j (+ (aget water-row-prev j) flow))
+                (aset water-row-cur j (+ (aget water-row-cur j) (- flow)))
+                (aset energy-row-prev j (* (aget energy-row-prev j) (- 1.0 friction)))
+                (aset energy-row-prev j (+ (aget energy-row-prev j) (- flow)))))
+            (if (and (< i (dec dim))
+                     (> (+ (aget terrain-row-cur j)
+                           (aget water-row-cur j)
+                           (aget energy-row-cur j))
+                        right-pressure))
+              (let [flow (/ (min (aget water-row-cur j)
+                                 (+ (aget terrain-row-cur j)
+                                    (aget water-row-cur j)
+                                    (aget energy-row-cur j)
+                                    (- right-pressure)))
+                            flow-div)]
+                (aset water-row-next j (+ (aget water-row-next j) flow))
+                (aset water-row-cur j (+ (aget water-row-cur j) (- flow)))
+                (aset energy-row-next j (* (aget energy-row-next j) (- 1.0 friction)))
+                (aset energy-row-next j (+ (aget energy-row-next j) flow))))
+            (if (and (> j 0)
+                     (> (+ (aget terrain-row-cur j)
+                           (aget water-row-cur j)
+                           (- (aget energy-row-cur j)))
+                        back-pressure))
+              (let [flow (/ (min (aget water-row-cur j)
+                                 (+ (aget terrain-row-cur j)
+                                    (aget water-row-cur j)
+                                    (- (aget energy-row-cur j))
+                                    (- back-pressure)))
+                            flow-div)]
+                (aset water-row-cur (dec j) (+ (aget water-row-cur (dec j)) flow))
+                (aset water-row-cur j (+ (aget water-row-cur j) (- flow)))
+                (aset energy-row-cur (dec j) (* (aget energy-row-cur (dec j)) (- 1.0 friction)))
+                (aset energy-row-cur (dec j) (+ (aget energy-row-cur (dec j)) (- flow)))))
+            (if (and (< j (dec dim))
+                     (> (+ (aget terrain-row-cur j)
+                           (aget water-row-cur j)
+                           (aget energy-row-cur j))
+                        front-pressure))
+              (let [flow (/ (min (aget water-row-cur j)
+                                 (+ (aget terrain-row-cur j)
+                                    (aget water-row-cur j)
+                                    (aget energy-row-cur j)
+                                    (- front-pressure)))
+                            flow-div)]
+                (aset water-row-cur (inc j) (+ (aget water-row-cur (inc j)) flow))
+                (aset water-row-cur j (+ (aget water-row-cur j) (- flow)))
+                (aset energy-row-cur (inc j) (* (aget energy-row-cur (inc j)) (- 1.0 friction)))
+                (aset energy-row-cur (inc j) (+ (aget energy-row-cur (inc j)) flow)))))
+\end{lstlisting}
+
+
+\subsection{Реконструкция поверхности}
+
+В данном подразделе указан листинг, относящийся к реконструкции поверхности сцены.
+
+В листинге \ref{lst:mesh} представлена реализация реконструкции поверхности.
+
+\begin{lstlisting}[
+                basicstyle={\fontsize{9}{10}\ttfamily},
+                mathescape=true,
+                showstringspaces=false,
+                tabsize=2,
+                flexiblecolumns=true,
+                language={Clojure},
+                label={lst:mesh}
+            ]
+(defn generate-voxel-mesh
+  "Generate mesh that surrounds our voxel model"
+  [voxels]
+  (let
+    [lookup-table (fill-lookup-table voxels)
+     exposed-faces (find-exposed-faces voxels lookup-table)
+     plane-faces (.entrySet exposed-faces)
+     faces (pmap combine-faces-single-plane plane-faces)
+     triangles (flatten (pmap triangulate-faces-single-plane faces))]
+
+    (Mesh. triangles)))
+\end{lstlisting}
+
+\subsection{Рендеринг вокселов}
+
+В данном подразделе указаны листинги, относящиеся к растеризации сцены.
+
+В листинге \ref{lst:render} описана реализация растеризации воксельной сцены.
+
+\begin{lstlisting}[
+                basicstyle={\fontsize{9}{10}\ttfamily},
+                mathescape=true,
+                showstringspaces=false,
+                tabsize=2,
+                flexiblecolumns=true,
+                language={Clojure},
+                label={lst:render}
+            ]
+(defn draw-triangles
+[canvas triangles mvp]
+(let
+[viewport [(.getWidth canvas) (.getHeight canvas)]
+ width ^long (viewport 0)
+ height ^long (viewport 1)
+ neg-inf Double/NEGATIVE_INFINITY
+ len ^long (* width height)
+ z-buffer ^doubles (hiphip/amake Double/TYPE [_ len] neg-inf)]
+
+(doall (pmap (fn [^Triangle triangle]
+               (let [v1 ^Vertex (:v1 triangle)
+                     v2 ^Vertex (:v2 triangle)
+                     v3 ^Vertex (:v3 triangle)
+                     p1 (camera/project-to-screen (:position v1) mvp viewport)
+                     p2 (camera/project-to-screen (:position v2) mvp viewport)
+                     p3 (camera/project-to-screen (:position v3) mvp viewport)
+                     p1-x ^double (m/mget p1 0)
+                     p1-y ^double (m/mget p1 1)
+                     p1-z ^double (m/mget p1 2)
+                     p2-x ^double (m/mget p2 0)
+                     p2-y ^double (m/mget p2 1)
+                     p2-z ^double (m/mget p2 2)
+                     p3-x ^double (m/mget p3 0)
+                     p3-y ^double (m/mget p3 1)
+                     p3-z ^double (m/mget p3 2)
+                     c ^int (colorize v2)
+                     min-x ^long (long (max 0.0 (Math/ceil (min p1-x p2-x p3-x))))
+                     max-x ^long (long (min (dec width) (Math/floor (max p1-x p2-x p3-x))))
+                     min-y ^long (long (max 0.0 (Math/ceil (min p1-y p2-y p3-y))))
+                     max-y ^long (long (min (dec height) (Math/floor (max p1-y p2-y p3-y))))
+                     area ^double (+ (* (- p1-y p3-y) (- p2-x p3-x)) (* (- p2-y p3-y) (- p3-x p1-x)))]
+
+                 (doall (p/pmap (fn [^long y]
+                                  (doall
+                                    (map (fn [^long x]
+                                           (let [b1 ^double (/ (+ (* (- y p3-y) (- p2-x p3-x))
+                                                                  (* (- p2-y p3-y) (- p3-x x)))
+                                                               area)
+                                                 b2 ^double (/ (+ (* (- y p1-y) (- p3-x p1-x))
+                                                                  (* (- p3-y p1-y) (- p1-x x)))
+                                                               area)
+                                                 b3 ^double (/ (+ (* (- y p2-y) (- p1-x p2-x))
+                                                                  (* (- p1-y p2-y) (- p2-x x)))
+                                                               area)
+                                                 depth ^double (+ (* b1 p1-z) (* b2 p2-z) (* b3 p3-z))
+                                                 z-index ^long (+ (* y width) x)]
+                                             (if (< (aget z-buffer z-index) (+ depth 10e-5))
+                                               (do
+                                                 (.setRGB canvas x y c)
+                                                 (aset z-buffer z-index depth)))))
+                                         (range min-x (inc max-x)))))
+                                (range min-y (inc max-y))))))
+             triangles))))
+
+(defn draw-mesh [canvas ^Mesh mesh mvp]
+(let [triangles (:triangles mesh)]+ 0.1
+(draw-triangles canvas triangles mvp)))
+
+(defn draw-voxels
+[^BufferedImage canvas voxels ^Camera camera]
+(let [mesh (voxel/generate-voxel-mesh voxels)
+    mvp (camera/model-view-projection-matrix (camera/perspective (:position camera))
+                                             (camera/get-view-matrix camera)
+                                             model-matrix)]
+(draw-mesh canvas mesh mvp)))
 \end{lstlisting}
 
 В листинге \ref{lst:lambert} описана реализация получения цвета по Ламберту.
@@ -101,9 +291,13 @@ Swing предоставляет широкий набор компоненто�
        (int (* b (modification 2))))))
 \end{lstlisting}
 
-
 % вывод по разделу
 \section{Вывод}
+
+В результате было реализовано программное обеспечение, моделирующее поведение воды.
+
+Для написания ПО использован язык программирования Clojure, проведены оптимизации
+кода с учётом подсказок типа.
 
 %%% Local Variables:
 %%% mode: latex
